@@ -21,6 +21,14 @@ const AboutBanner: React.FC<AboutBannerProps> = ({
       {/* Background Particles */}
       <ParticleBackground />
 
+      {/* ✅ 비네팅 효과 - 검은색 그라데이션 */}
+      <div 
+        className="absolute inset-0 z-[1] pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at center, transparent 0%, transparent 40%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.8) 100%)'
+        }}
+      />
+
       {/* Corner Decorations - L shapes */}
       {/* Top Left - ㄱ */}
       <div className="absolute top-4 left-4 md:top-[30px] md:left-[30px] w-10 h-10 md:w-[60px] md:h-[60px] z-[3]">
@@ -63,17 +71,17 @@ const AboutBanner: React.FC<AboutBannerProps> = ({
           BTL영역의 통합적인 Marketing 전략으로 One-Stop Service를 제공합니다.
         </p>
 
-        {/* Process Boxes - No arrows */}
-        <div className="flex flex-row gap-6 sm:gap-8 md:gap-10 lg:gap-12 items-center justify-center w-full max-w-[1000px] px-4">
-          <div className="flex-shrink-0 w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] opacity-0 scale-75 animate-[fadeInScale_0.8s_ease_1.2s_forwards]">
+        {/* Process Boxes - 크기 증가 */}
+        <div className="flex flex-row gap-8 sm:gap-10 md:gap-12 lg:gap-16 items-center justify-center w-full max-w-[1200px] px-4">
+          <div className="flex-shrink-0 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] md:w-[200px] md:h-[200px] lg:w-[220px] lg:h-[220px] xl:w-[250px] xl:h-[250px] opacity-0 scale-75 animate-[fadeInScale_0.8s_ease_1.2s_forwards]">
             <ProcessCube text="기획" />
           </div>
 
-          <div className="flex-shrink-0 w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] opacity-0 scale-75 animate-[fadeInScale_0.8s_ease_1.6s_forwards]">
+          <div className="flex-shrink-0 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] md:w-[200px] md:h-[200px] lg:w-[220px] lg:h-[220px] xl:w-[250px] xl:h-[250px] opacity-0 scale-75 animate-[fadeInScale_0.8s_ease_1.6s_forwards]">
             <ProcessCube text="준비" />
           </div>
 
-          <div className="flex-shrink-0 w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] opacity-0 scale-75 animate-[fadeInScale_0.8s_ease_2s_forwards]">
+          <div className="flex-shrink-0 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] md:w-[200px] md:h-[200px] lg:w-[220px] lg:h-[220px] xl:w-[250px] xl:h-[250px] opacity-0 scale-75 animate-[fadeInScale_0.8s_ease_2s_forwards]">
             <ProcessCube text="운영" />
           </div>
         </div>

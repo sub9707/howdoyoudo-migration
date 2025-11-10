@@ -35,10 +35,36 @@ const ParticleBackground: React.FC = () => {
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
+    // ✅ 부드러운 원형 텍스처 생성 함수
+    const createCircleTexture = () => {
+      const canvas = document.createElement('canvas');
+      const size = 64;
+      canvas.width = size;
+      canvas.height = size;
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+
+      const center = size / 2;
+      const radius = size / 2;
+
+      // 방사형 그라데이션으로 부드러운 원 생성
+      const gradient = ctx.createRadialGradient(center, center, 0, center, center, radius);
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');    // 중심: 완전 불투명
+      gradient.addColorStop(0.2, 'rgba(255, 255, 255, 1)');  
+      gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.5)'); // 중간: 반투명
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');     // 가장자리: 완전 투명
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+
+      return new THREE.CanvasTexture(canvas);
+    };
+
     // Particle System - Adjust count for mobile
     const particlesGeometry = new THREE.BufferGeometry();
     const isMobile = window.innerWidth <= 768;
-    const particlesCount = isMobile ? 1000 : 2000; // Reduce particles on mobile
+    const particlesCount = isMobile ? 1000 : 2000;
     const posArray = new Float32Array(particlesCount * 3);
     const velocityArray = new Float32Array(particlesCount * 3);
 
@@ -52,12 +78,17 @@ const ParticleBackground: React.FC = () => {
       new THREE.BufferAttribute(posArray, 3)
     );
 
+    // ✅ 원형 텍스처를 적용한 파티클 머티리얼
+    const particleTexture = createCircleTexture();
     const particlesMaterial = new THREE.PointsMaterial({
-      size: isMobile ? 1.2 : 0.8, // Larger particles on mobile for visibility
+      size: isMobile ? 1.5 : 1.0,
       color: 0xffffff,
       transparent: true,
-      opacity: 0.2,
+      opacity: 0.3,
       blending: THREE.AdditiveBlending,
+      map: particleTexture,
+      sizeAttenuation: true,
+      depthWrite: false,
     });
 
     const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
@@ -137,6 +168,7 @@ const ParticleBackground: React.FC = () => {
 
       particlesGeometry.dispose();
       particlesMaterial.dispose();
+      if (particleTexture) particleTexture.dispose();
       renderer.dispose();
     };
   }, []);
