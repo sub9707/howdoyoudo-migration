@@ -67,7 +67,7 @@ const AboutBanner: React.FC<AboutBannerProps> = ({
         </p>
 
         {/* Description */}
-        <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-8 md:mb-12 lg:mb-[60px] opacity-0 -translate-y-[20px] animate-[fadeInDown_1s_ease_0.9s_forwards] text-white/90 px-4">
+        <p className="text-sm sm:text-base md:text-lg lg:text-xl  opacity-0 -translate-y-[20px] animate-[fadeInDown_1s_ease_0.9s_forwards] text-white/90 px-4">
           BTL영역의 통합적인 Marketing 전략으로 One-Stop Service를 제공합니다.
         </p>
 
