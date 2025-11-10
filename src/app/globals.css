@@ -21,6 +21,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+
 /* Custom Animations */
 @keyframes slide-up {
   0% {

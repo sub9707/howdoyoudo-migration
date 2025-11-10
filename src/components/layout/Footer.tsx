@@ -1,12 +1,20 @@
+'use client';
+
 import Link from 'next/link'
+import { usePathname } from 'next/navigation';
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/dashboard")) {
+    return null;
+  }
 
   const businessFields = [
     'BTL Promotion',
     '컨설팅체어스',
-    '멀업스토어', 
+    '멀업스토어',
     '스타일링클래스',
     '에이전시',
     '진시',
@@ -29,7 +37,7 @@ export default function Footer() {
         <div className="py-16">
           {/* Main Footer Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
-            
+
             {/* Company Info */}
             <div className="space-y-6">
               <h3 className="text-2xl font-bold text-gray-900 tracking-wider">
@@ -42,7 +50,7 @@ export default function Footer() {
                 </p>
                 <p>
                   <span className="font-medium">CEO</span><br />
-                  김덕일
+                  김덕원
                 </p>
                 <p>
                   <span className="font-medium">Incorporation</span><br />
@@ -58,7 +66,7 @@ export default function Footer() {
               </h4>
               <div className="grid grid-cols-2 gap-2">
                 {businessFields.map((field, index) => (
-                  <span 
+                  <span
                     key={index}
                     className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
                   >
@@ -94,17 +102,17 @@ export default function Footer() {
               <p className="text-sm text-gray-500">
                 © {currentYear} <span className="text-red-500 font-medium">howdoyoudo</span>. All Rights Reserved.
               </p>
-              
+
               {/* Additional Links */}
               <div className="flex space-x-6">
-                <Link 
-                  href="/privacy" 
+                <Link
+                  href="/privacy"
                   className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
                 >
                   Privacy Policy
                 </Link>
-                <Link 
-                  href="/terms" 
+                <Link
+                  href="/terms"
                   className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
                 >
                   Terms of Service

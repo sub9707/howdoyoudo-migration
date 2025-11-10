@@ -1,4 +1,5 @@
 import Divider from '@/components/ui/Divider';
+import AboutBanner from '@/components/banner/AboutBanner';
 import React from 'react';
 
 export default function AboutPage() {
@@ -20,67 +21,8 @@ export default function AboutPage() {
       </section>
 
       {/* Image Container Section */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="bg-black shadow-2xl overflow-hidden">
-            <div className="aspect-[20/9] bg-gradient-to-r from-gray-900 via-black to-gray-900 flex flex-col justify-center items-center text-white relative">
-              
-              {/* Subtle grid pattern */}
-              <div className="absolute inset-0 opacity-10">
-                <div 
-                  className="w-full h-full"
-                  style={{
-                    backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-                    backgroundSize: '60px 60px'
-                  }}
-                ></div>
-              </div>
-
-              {/* Content */}
-              <div className="relative z-10 text-center space-y-8">
-                <h3 className="text-5xl md:text-6xl font-black tracking-wide mb-8">
-                  HOWDOYOUDO CO.,LTD
-                </h3>
-                
-                <div className="space-y-3 text-xl text-gray-300 max-w-4xl">
-                  <p>주식회사 하우두유두는 고객이 목표하는 마케팅 성과를 위해</p>
-                  <p>BTL영역의 통합적인 Marketing 전략으로 One-Stop Service를 제공합니다.</p>
-                </div>
-
-                {/* Process Steps */}
-                <div className="flex justify-center items-center space-x-12 mt-16">
-                  <div className="text-center">
-                    <div className="w-24 h-24 bg-white/10 border border-white/20 flex items-center justify-center mb-4">
-                      <span className="text-lg font-bold">기획</span>
-                    </div>
-                  </div>
-                  
-                  <div className="w-16 h-px bg-white/30"></div>
-                  
-                  <div className="text-center">
-                    <div className="w-24 h-24 bg-white/10 border border-white/20 flex items-center justify-center mb-4">
-                      <span className="text-lg font-bold">준비</span>
-                    </div>
-                  </div>
-                  
-                  <div className="w-16 h-px bg-white/30"></div>
-                  
-                  <div className="text-center">
-                    <div className="w-24 h-24 bg-white/10 border border-white/20 flex items-center justify-center mb-4">
-                      <span className="text-lg font-bold">운영</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Corner details */}
-              <div className="absolute top-8 left-8 w-8 h-8 border-l-2 border-t-2 border-white/40"></div>
-              <div className="absolute top-8 right-8 w-8 h-8 border-r-2 border-t-2 border-white/40"></div>
-              <div className="absolute bottom-8 left-8 w-8 h-8 border-l-2 border-b-2 border-white/40"></div>
-              <div className="absolute bottom-8 right-8 w-8 h-8 border-r-2 border-b-2 border-white/40"></div>
-            </div>
-          </div>
-        </div>
+      <section className="py-24">
+        <AboutBanner height="700px"/>
       </section>
 
       {/* Company Philosophy */}
