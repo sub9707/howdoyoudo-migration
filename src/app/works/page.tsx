@@ -38,7 +38,7 @@ export default async function WorksPage() {
   
   return (
     <div className="min-h-screen bg-white">
-      <PageHeader title='CREATIVE BUSINESS' />
+      <PageHeader title='CREATIVE BUSINESS' description='하우두유두가 함께한 여정을 살펴보세요' />
       
       <WorksClient initialData={initialData} />
     </div>

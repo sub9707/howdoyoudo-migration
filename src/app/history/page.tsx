@@ -13,7 +13,7 @@ export default function HistoryPage() {
   const { companyHistory } = tempData;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       {/* 상단 헤더 */}
       <PageHeader 
       title='HISTORY' 

@@ -4,10 +4,10 @@ import AboutSection from './_components/AboutSection';
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen text-gray-900">
 
       {/* Hero Section */}
-      <section className="py-40 bg-white border-b border-gray-200">
+      <section className="py-40 border-gray-200">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <h1 className="text-8xl md:text-9xl font-black tracking-tighter leading-none text-gray-900">
             CREATIVE

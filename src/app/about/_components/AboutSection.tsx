@@ -6,7 +6,7 @@ import Divider from '@/components/ui/Divider';
 
 export default function AboutSection() {
   return (
-    <section className="py-40 bg-white">
+    <section className="py-40">
       <div className="max-w-7xl mx-auto px-6 space-y-32">
 
         <AboutCard
