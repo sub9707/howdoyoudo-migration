@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@import "./pretendard.css";
+
 :root {
   --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
 }
@@ -21,6 +23,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html, body { 
+ font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; 
+ }
+
 
 /* Custom Animations */
 @keyframes slide-up {
@@ -31,6 +37,39 @@ body {
   100% {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* About Hero Title Animations - Elegant Fade In */
+@keyframes aboutTitleFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+    filter: blur(8px);
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes aboutSubtitleFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+    filter: blur(6px);
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
   }
 }
 
@@ -139,6 +178,27 @@ body {
 
 .animate-scroll-indicator {
   animation: scroll-indicator 2s ease-in-out infinite;
+}
+
+/* About Hero Title Animation Classes */
+.about-hero-title {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(40px) scale(0.95);
+  filter: blur(8px);
+  animation: aboutTitleFadeIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+}
+
+.about-hero-subtitle {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(30px) scale(0.98);
+  filter: blur(6px);
+  animation: aboutSubtitleFadeIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.8s;
+  animation-fill-mode: both;
 }
 
 /* Hero Text Sequential Animation Classes */
