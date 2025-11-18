@@ -32,7 +32,6 @@ export default function AboutCard({
         reverse ? 'lg:flex-row-reverse' : ''
       }`}
     >
-      {/* Visual Card with Gradient */}
       <motion.div
         whileHover={{ 
           scale: 1.03,
@@ -45,14 +44,12 @@ export default function AboutCard({
           transformStyle: 'preserve-3d',
         }}
       >
-        {/* Gradient Background with Noise Texture */}
         <div 
           className="absolute inset-0"
           style={{
             background: `linear-gradient(135deg, ${gradientFrom} 0%, ${gradientTo} 100%)`,
           }}
         >
-          {/* Subtle Grid Pattern Overlay */}
           <div 
             className="absolute inset-0 opacity-5"
             style={{
@@ -65,7 +62,6 @@ export default function AboutCard({
           />
         </div>
 
-        {/* Floating Geometric Accent */}
         <motion.div
           animate={{ 
             y: [0, -20, 0],
@@ -88,6 +84,7 @@ export default function AboutCard({
             <motion.div
               initial={{ opacity: 0, x: reverse ? 20 : -20 }}
               whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
               transition={{ delay: 0.3, duration: 0.6 }}
               className="inline-block"
             >
@@ -121,10 +118,11 @@ export default function AboutCard({
       </motion.div>
 
       {/* Text Content Section */}
-      <div className="flex-1 flex items-center">
+      <div className={`flex-1 flex items-center ${reverse ? "mr-12" : "ml-12"}`}>
         <motion.div
           initial={{ opacity: 0, x: reverse ? -40 : 40 }}
           whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
           transition={{ delay: 0.4, duration: 0.8 }}
           className="space-y-8 max-w-2xl"
         >
@@ -137,6 +135,7 @@ export default function AboutCard({
               <motion.div 
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
                 transition={{ delay: 0.6, duration: 0.6 }}
                 className="h-1 bg-gradient-to-r from-gray-900 to-gray-500 mt-4"
                 style={{ transformOrigin: reverse ? 'right' : 'left' }}
@@ -151,6 +150,7 @@ export default function AboutCard({
                 key={idx}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
                 transition={{ delay: 0.7 + idx * 0.1, duration: 0.5 }}
                 className="text-xl leading-relaxed text-gray-700"
               >

@@ -5,6 +5,9 @@ import AboutCard from './AboutCard';
 import Divider from '@/components/ui/Divider';
 
 export default function AboutSection() {
+  const getCurrentYear = () => {
+    return new Date().getFullYear() - 2005;
+  }
   return (
     <section className="py-40">
       <div className="max-w-7xl mx-auto px-6 space-y-32">
@@ -14,8 +17,8 @@ export default function AboutSection() {
           subtitle="하우두유두"
           headline={
             <>
-              <span className="text-5xl font-black text-black">12년</span> 동안 축적된 경험과 노하우를 바탕으로<br />
-              기업 이미지와 경쟁력 강화를 위한 순간 밖이 되고자 합니다.
+              <span className="text-5xl font-black text-black">{getCurrentYear()}년</span> 동안 축적된 경험과 노하우를 바탕으로<br />
+              기업 이미지와 경쟁력 강화를 위한<br /> 손과 발이 되고자 합니다.
             </>
           }
           description={[
@@ -34,7 +37,7 @@ export default function AboutSection() {
           headline={
             <>
               하우두유두를 지탱하는 프로 집단의{' '}
-              <span className="font-extrabold text-black">Best 전신</span>입니다.
+              <span className="font-extrabold text-black">Best 정신</span>입니다.
             </>
           }
           description={[
