@@ -17,13 +17,13 @@ export default function AboutSection() {
           subtitle="하우두유두"
           headline={
             <>
-              <span className="text-5xl font-black text-black">{getCurrentYear()}년</span> 동안 축적된 경험과 노하우를 바탕으로<br />
-              기업 이미지와 경쟁력 강화를 위한<br /> 손과 발이 되고자 합니다.
+              <div className="text-5xl font-black text-black mb-6">{getCurrentYear()}년 경험과 노하우</div>
+              <span>기업의 성장과 가치를 위한 완벽한 파트너</span>
             </>
           }
           description={[
-            '어디서부터 어떻게 시작해야 할지 모르셔도 괜찮습니다.',
-            '하우두유두의 인재들이 기업 이미지와 브랜드 확장에 도움을 드릴 것입니다.',
+            '시작부터 함께합니다.',
+            '하우두유두 전문가들이 귀사의 성공적인 브랜딩을 이끌 것입니다.',
           ]}
           gradientFrom="#0F172A"
           gradientTo="#334155"
@@ -36,8 +36,8 @@ export default function AboutSection() {
           subtitle="하우두유두"
           headline={
             <>
-              하우두유두를 지탱하는 프로 집단의{' '}
-              <span className="font-extrabold text-black">Best 정신</span>입니다.
+              <div className="text-5xl font-black text-black mb-6">하우두유두를 움직이는 힘,</div>
+              그것은 바로 프로 집단의 <span className="font-extrabold text-black">Best 정신</span>입니다.
             </>
           }
           description={[

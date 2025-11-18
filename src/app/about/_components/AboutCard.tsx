@@ -129,9 +129,9 @@ export default function AboutCard({
           {/* Headline with accent */}
           <div>
             <div className="inline-block">
-              <p className="text-3xl font-semibold leading-relaxed text-gray-900">
+              <div className="text-3xl font-semibold leading-relaxed text-gray-900">
                 {headline}
-              </p>
+              </div>
               <motion.div 
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
