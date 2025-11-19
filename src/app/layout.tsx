@@ -1,8 +1,11 @@
+// src/app/layout.tsx
 import { Inter } from 'next/font/google'
 import { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import './styles/globals.css'
+import PageTransition from '@/components/layout/PageTransition'
+import { TransitionProvider } from '@/context/TransitionContext'
+import '../styles/globals.css'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -16,16 +19,6 @@ export const metadata: Metadata = {
     template: '%s | HOWDOYOUDO'
   },
   description: 'Welcome to HOWDOYOUDO - Creative studio and digital experiences',
-  keywords: ['creative', 'studio', 'design', 'digital'],
-  authors: [{ name: 'HOWDOYOUDO' }],
-  openGraph: {
-    type: 'website',
-    locale: 'ko_KR',
-    url: 'https://howdoyoudo.com',
-    siteName: 'HOWDOYOUDO',
-    title: 'HOWDOYOUDO | Creative Studio',
-    description: 'Welcome to HOWDOYOUDO - Creative studio and digital experiences',
-  },
 }
 
 export default function RootLayout({
@@ -36,13 +29,15 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${inter.variable} scroll-smooth`}>
       <body className="font-sans antialiased bg-gray-50 text-gray-900">
-        <div className="min-h-screen">
-          <Header />
-          <main>
-            {children}
-          </main>
-          <Footer/>
-        </div>
+        <TransitionProvider>
+          <div className="min-h-screen">
+            <Header />
+            <PageTransition>
+              <main>{children}</main>
+            </PageTransition>
+            <Footer />
+          </div>
+        </TransitionProvider>
       </body>
     </html>
   )

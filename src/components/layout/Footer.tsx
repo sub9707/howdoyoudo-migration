@@ -1,6 +1,7 @@
+// src/components/layout/Footer.tsx의 Link를 TransitionLink로 변경
 'use client';
 
-import Link from 'next/link'
+import TransitionLink from './TransitionLink'
 import { usePathname } from 'next/navigation';
 
 export default function Footer() {
@@ -35,9 +36,7 @@ export default function Footer() {
     <footer className="bg-gray-50 border-t border-gray-200">
       <div className="w-full px-16 sm:px-20 lg:px-32 xl:px-40">
         <div className="py-16">
-          {/* Main Footer Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
-
             {/* Company Info */}
             <div className="space-y-6">
               <h3 className="text-2xl font-bold text-gray-900 tracking-wider">
@@ -83,40 +82,37 @@ export default function Footer() {
               </h4>
               <nav className="space-y-3">
                 {navItems.map((item) => (
-                  <Link
+                  <TransitionLink
                     key={item.href}
                     href={item.href}
                     className="block text-sm text-gray-600 hover:text-gray-900 transition-colors duration-300"
                   >
                     {item.label}
-                  </Link>
+                  </TransitionLink>
                 ))}
               </nav>
             </div>
           </div>
 
-          {/* Divider */}
           <div className="border-t border-gray-200 pt-8">
-            {/* Copyright */}
             <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
               <p className="text-sm text-gray-500">
                 © {currentYear} <span className="text-red-500 font-medium">howdoyoudo</span>. All Rights Reserved.
               </p>
 
-              {/* Additional Links */}
               <div className="flex space-x-6">
-                <Link
+                <TransitionLink
                   href="/privacy"
                   className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
                 >
                   Privacy Policy
-                </Link>
-                <Link
+                </TransitionLink>
+                <TransitionLink
                   href="/terms"
                   className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
                 >
                   Terms of Service
-                </Link>
+                </TransitionLink>
               </div>
             </div>
           </div>
