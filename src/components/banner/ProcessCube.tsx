@@ -42,9 +42,11 @@ const ProcessCube: React.FC<ProcessCubeProps> = ({ text }) => {
   useEffect(() => {
     if (!containerRef.current) return;
 
+    const container = containerRef.current;
+
     // === Scene ===
     const scene = new THREE.Scene();
-    // ✅ 배경색 제거 - 투명하게 만들기
+    // 배경색 제거 - 투명하게 만들기
     sceneRef.current = scene;
 
     // === Camera ===
@@ -57,7 +59,7 @@ const ProcessCube: React.FC<ProcessCubeProps> = ({ text }) => {
 
     // === Renderer ===
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    
+
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(250, 250, false); // ✅ 렌더러 크기 증가 (200 → 250)
     containerRef.current.appendChild(renderer.domElement);
@@ -71,14 +73,14 @@ const ProcessCube: React.FC<ProcessCubeProps> = ({ text }) => {
       const ctx = canvas.getContext('2d');
       if (!ctx) return null;
 
-      // ✅ 모든 면을 투명하게
+      // 모든 면을 투명하게
       const gradient = ctx.createLinearGradient(0, 0, 512, 512);
       gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
       gradient.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, 512, 512);
 
-      // ✅ 텍스트 면에는 안쪽 보더 없음
+      // 텍스트 면에는 안쪽 보더 없음
       if (!isMain) {
         ctx.strokeStyle = 'rgba(255,255,255,0.4)'; // ✅ 보더 투명도 조정
         ctx.lineWidth = 4;
@@ -90,11 +92,11 @@ const ProcessCube: React.FC<ProcessCubeProps> = ({ text }) => {
         ctx.font = `900 ${100 * scale}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        
+
         // 그림자 완전 제거
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
-        
+
         // 순수 흰색으로 10번 그려서 매우 진하고 선명하게
         ctx.fillStyle = '#ffffff';
         for (let i = 0; i < 10; i++) {
@@ -111,9 +113,9 @@ const ProcessCube: React.FC<ProcessCubeProps> = ({ text }) => {
       new THREE.MeshStandardMaterial({ map: createTexture('', false, textScale), transparent: true, opacity: 0.8 }),
       new THREE.MeshStandardMaterial({ map: createTexture('', false, textScale), transparent: true, opacity: 0.8 }),
       new THREE.MeshStandardMaterial({ map: createTexture('', false, textScale), transparent: true, opacity: 0.8 }),
-      new THREE.MeshStandardMaterial({ 
-        map: createTexture(text, true, textScale), 
-        transparent: true, 
+      new THREE.MeshStandardMaterial({
+        map: createTexture(text, true, textScale),
+        transparent: true,
         opacity: 0.8,
         emissive: 0xffffff, // ✅ 자체 발광으로 텍스트만 밝게
         emissiveIntensity: 0.5 // ✅ 발광 강도 증가
@@ -201,7 +203,9 @@ const ProcessCube: React.FC<ProcessCubeProps> = ({ text }) => {
         m.dispose();
       });
       renderer.dispose();
-      containerRef.current?.removeChild(renderer.domElement);
+      if (container && renderer.domElement.parentNode === container) {
+        container.removeChild(renderer.domElement);
+      }
     };
   }, [text]);
 

@@ -1,4 +1,3 @@
-import ScrollToTop from '@/components/ui/ScrollToTop'
 import React from 'react'
 import YearBar from './_components/YearBar'
 

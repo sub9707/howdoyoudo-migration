@@ -7,7 +7,7 @@ import Overview from './_components/Overview';
 import PostManagement from './_components/PostManagement';
 import Analytics from './_components/Analytics';
 import { User, LoginFormData, MenuType, VisitData, MonthlyData } from '@/types/dashboard';
-import { authApi, dashboardApi } from '../utils/api';
+import { authApi, dashboardApi } from '@/utils/api';
 
 interface DashboardStats {
     statCards: Array<{ title: string; value: string; change: number }>;

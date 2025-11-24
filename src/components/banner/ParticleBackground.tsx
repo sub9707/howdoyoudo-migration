@@ -16,6 +16,7 @@ const ParticleBackground: React.FC = () => {
   useEffect(() => {
     if (!containerRef.current) return;
 
+    const container = containerRef.current;
     // Scene setup
     const scene = new THREE.Scene();
     sceneRef.current = scene;
@@ -41,7 +42,7 @@ const ParticleBackground: React.FC = () => {
       const size = 64;
       canvas.width = size;
       canvas.height = size;
-      
+
       const ctx = canvas.getContext('2d');
       if (!ctx) return null;
 
@@ -51,7 +52,7 @@ const ParticleBackground: React.FC = () => {
       // 방사형 그라데이션으로 부드러운 원 생성
       const gradient = ctx.createRadialGradient(center, center, 0, center, center, radius);
       gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');    // 중심: 완전 불투명
-      gradient.addColorStop(0.2, 'rgba(255, 255, 255, 1)');  
+      gradient.addColorStop(0.2, 'rgba(255, 255, 255, 1)');
       gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.5)'); // 중간: 반투명
       gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');     // 가장자리: 완전 투명
 
@@ -78,7 +79,7 @@ const ParticleBackground: React.FC = () => {
       new THREE.BufferAttribute(posArray, 3)
     );
 
-    // ✅ 원형 텍스처를 적용한 파티클 머티리얼
+    // 원형 텍스처를 적용한 파티클 머티리얼
     const particleTexture = createCircleTexture();
     const particlesMaterial = new THREE.PointsMaterial({
       size: isMobile ? 1.5 : 1.0,
@@ -157,13 +158,13 @@ const ParticleBackground: React.FC = () => {
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
-      
+
       if (animationIdRef.current) {
         cancelAnimationFrame(animationIdRef.current);
       }
 
-      if (containerRef.current && renderer.domElement) {
-        containerRef.current.removeChild(renderer.domElement);
+      if (container && renderer.domElement.parentNode === container) {
+        container.removeChild(renderer.domElement);
       }
 
       particlesGeometry.dispose();

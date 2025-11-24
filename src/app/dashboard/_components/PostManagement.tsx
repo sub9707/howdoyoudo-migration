@@ -1,7 +1,7 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { User } from '@/types/dashboard';
-import { postsApi } from '../../utils/api';
+import { postsApi } from '@/utils/api';
 
 interface Post {
   id: number;
@@ -38,12 +38,7 @@ const PostManagement: React.FC<PostManagementProps> = ({ currentUser }) => {
     author: ''
   });
 
-  // 게시글 목록 로드
-  useEffect(() => {
-    loadPosts();
-  }, [pagination.currentPage, filters]);
-
-  const loadPosts = async (): Promise<void> => {
+  const loadPosts = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
       setError('');
@@ -52,11 +47,11 @@ const PostManagement: React.FC<PostManagementProps> = ({ currentUser }) => {
         page: pagination.currentPage,
         limit: pagination.limit,
         ...(filters.status && { status: filters.status }),
-        ...(filters.author && { author: filters.author })
+        ...(filters.author && { author: filters.author }),
       };
 
       const response = await postsApi.getPosts(params);
-      
+
       if (response.success && response.data) {
         setPosts(response.data.posts);
         setPagination(response.data.pagination);
@@ -69,12 +64,12 @@ const PostManagement: React.FC<PostManagementProps> = ({ currentUser }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pagination.currentPage, pagination.limit, filters]);
 
   const handleEdit = async (postId: number): Promise<void> => {
     // 실제 환경에서는 수정 모달이나 페이지로 이동
     console.log(`게시글 ${postId} 수정`);
-    
+
     // 예시: 제목 수정
     const newTitle = prompt('새 제목을 입력하세요:');
     if (newTitle) {
@@ -83,7 +78,7 @@ const PostManagement: React.FC<PostManagementProps> = ({ currentUser }) => {
           id: postId,
           title: newTitle
         });
-        
+
         if (response.success) {
           await loadPosts(); // 목록 새로고침
         } else {
@@ -103,7 +98,7 @@ const PostManagement: React.FC<PostManagementProps> = ({ currentUser }) => {
 
     try {
       const response = await postsApi.deletePost(postId);
-      
+
       if (response.success) {
         await loadPosts(); // 목록 새로고침
       } else {
@@ -133,7 +128,7 @@ const PostManagement: React.FC<PostManagementProps> = ({ currentUser }) => {
         content,
         author: currentUser.username
       });
-      
+
       if (response.success) {
         await loadPosts(); // 목록 새로고침
       } else {
@@ -167,19 +162,23 @@ const PostManagement: React.FC<PostManagementProps> = ({ currentUser }) => {
     );
   };
 
+  useEffect(() => {
+    loadPosts();
+  }, [loadPosts]);
+
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold text-black mb-6">게시글 관리</h2>
-      
+
       <div className="bg-white border-2 border-black p-6">
         {/* 헤더 및 필터 */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
             <select
               value={filters.status}
-              onChange={(e) => setFilters(prev => ({ 
-                ...prev, 
-                status: e.target.value as typeof filters.status 
+              onChange={(e) => setFilters(prev => ({
+                ...prev,
+                status: e.target.value as typeof filters.status
               }))}
               className="px-3 py-2 border-2 border-gray-300 bg-white text-black focus:border-black focus:outline-none"
             >
@@ -188,20 +187,20 @@ const PostManagement: React.FC<PostManagementProps> = ({ currentUser }) => {
               <option value="draft">초안</option>
               <option value="archived">보관됨</option>
             </select>
-            
+
             <input
               type="text"
               placeholder="작성자 검색"
               value={filters.author}
-              onChange={(e) => setFilters(prev => ({ 
-                ...prev, 
-                author: e.target.value 
+              onChange={(e) => setFilters(prev => ({
+                ...prev,
+                author: e.target.value
               }))}
               className="px-3 py-2 border-2 border-gray-300 bg-white text-black focus:border-black focus:outline-none"
             />
           </div>
-          
-          <button 
+
+          <button
             onClick={handleCreatePost}
             className="bg-black text-white px-4 py-2 hover:bg-gray-800 transition-colors"
             disabled={loading}
@@ -243,14 +242,14 @@ const PostManagement: React.FC<PostManagementProps> = ({ currentUser }) => {
                         </p>
                       </div>
                       <div className="flex space-x-2">
-                        <button 
+                        <button
                           onClick={() => handleEdit(post.id)}
                           className="text-sm text-gray-600 hover:text-black transition-colors"
                           disabled={loading}
                         >
                           수정
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDelete(post.id)}
                           className="text-sm text-red-600 hover:text-red-800 transition-colors"
                           disabled={loading}
@@ -272,35 +271,34 @@ const PostManagement: React.FC<PostManagementProps> = ({ currentUser }) => {
             {pagination.totalPages > 1 && (
               <div className="flex justify-center">
                 <div className="flex space-x-2">
-                  <button 
+                  <button
                     onClick={() => handlePageChange(pagination.currentPage - 1)}
                     disabled={pagination.currentPage === 1 || loading}
                     className="px-3 py-1 border border-gray-300 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     이전
                   </button>
-                  
+
                   {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                     const pageNumber = i + 1;
                     const isActive = pageNumber === pagination.currentPage;
-                    
+
                     return (
                       <button
                         key={pageNumber}
                         onClick={() => handlePageChange(pageNumber)}
                         disabled={loading}
-                        className={`px-3 py-1 ${
-                          isActive 
-                            ? 'bg-black text-white' 
-                            : 'border border-gray-300 text-gray-600 hover:bg-gray-100'
-                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        className={`px-3 py-1 ${isActive
+                          ? 'bg-black text-white'
+                          : 'border border-gray-300 text-gray-600 hover:bg-gray-100'
+                          } disabled:opacity-50 disabled:cursor-not-allowed`}
                       >
                         {pageNumber}
                       </button>
                     );
                   })}
-                  
-                  <button 
+
+                  <button
                     onClick={() => handlePageChange(pagination.currentPage + 1)}
                     disabled={pagination.currentPage === pagination.totalPages || loading}
                     className="px-3 py-1 border border-gray-300 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"

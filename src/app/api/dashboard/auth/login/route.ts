@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       const userData: UserData = userDataJson as UserData;
       users = userData.users || [];
     } catch (error) {
-      console.log('tempSecret.json 파일을 찾을 수 없어 기본 사용자 데이터를 사용합니다.');
+      console.error('tempSecret.json 파일을 찾을 수 없어 기본 사용자 데이터를 사용합니다.', error);
       users = [
         {
           username: 'admin',

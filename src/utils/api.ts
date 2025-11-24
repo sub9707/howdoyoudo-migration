@@ -1,9 +1,7 @@
-// src/utils/api.ts
-
 import { User } from "@/types/dashboard";
 import React from "react";
 
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;

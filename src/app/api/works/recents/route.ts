@@ -16,7 +16,7 @@ export interface RecentsResponse {
 }
 
 // Category mapping from internal categories to display categories
-const categoryMap: Record<string, string> = {
+const categoryMap: Record<string, string> = { 
   'csr-campaign': 'CSR campaign',
   'show-case': 'Launching Showcase', 
   'star-marketing': 'Star marketing',
