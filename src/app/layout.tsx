@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import ScrollToTop from '@/components/ui/ScrollToTop'
 import '../styles/globals.css'
 import PageTransition from '@/components/ui/PageTransition'
 
@@ -35,6 +36,8 @@ export default function RootLayout({
             <Footer />
           </div>
         </PageTransition>
+        
+        <ScrollToTop />
       </body>
     </html>
   )

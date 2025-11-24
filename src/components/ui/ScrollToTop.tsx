@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react'
 
-interface ScrollButtonProps {
+interface ScrollToTopProps {
   showAfter?: number
   className?: string
 }
 
-export default function ScrollButtons({ 
+export default function ScrollToTop({ 
   showAfter = 300,
   className = ""
-}: ScrollButtonProps) {
+}: ScrollToTopProps) {
   const [showTop, setShowTop] = useState(false)
   const [showBottom, setShowBottom] = useState(false)
 
@@ -20,11 +20,11 @@ export default function ScrollButtons({
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight
 
       setShowTop(scrolled > showAfter)
-      setShowBottom(scrolled < maxScroll - 50) // 거의 맨 아래면 버튼 숨김
+      setShowBottom(scrolled < maxScroll - 50)
     }
 
     window.addEventListener('scroll', toggleVisibility)
-    toggleVisibility() // 초기 실행
+    toggleVisibility()
 
     return () => window.removeEventListener('scroll', toggleVisibility)
   }, [showAfter])
@@ -38,7 +38,7 @@ export default function ScrollButtons({
   }
 
   return (
-    <div className="fixed bottom-8 right-8 flex flex-col gap-3 z-50">
+    <div className="fixed bottom-8 right-8 flex flex-col gap-3 z-[99999]">
       {/* 맨 위로 버튼 */}
       <button
         onClick={scrollToTop}
@@ -46,10 +46,9 @@ export default function ScrollButtons({
           w-12 h-12
           bg-black hover:bg-gray-800
           text-white
-          cursor-pointer
           shadow-lg hover:shadow-xl
-          transition-opacity duration-500 ease-in-out
-          ${showTop ? "opacity-100" : "opacity-0 pointer-events-none"}
+          transition-all duration-300
+          ${showTop ? 'opacity-100' : 'opacity-0 pointer-events-none'}
           ${className}
         `}
         aria-label="맨 위로 이동"
@@ -72,10 +71,9 @@ export default function ScrollButtons({
           w-12 h-12
           bg-black hover:bg-gray-800
           text-white
-          cursor-pointer
           shadow-lg hover:shadow-xl
-          transition-opacity duration-500 ease-in-out
-          ${showBottom ? "opacity-100" : "opacity-0 pointer-events-none"}
+          transition-all duration-300
+          ${showBottom ? 'opacity-100' : 'opacity-0 pointer-events-none'}
           ${className}
         `}
         aria-label="맨 아래로 이동"

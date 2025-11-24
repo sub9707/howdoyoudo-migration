@@ -10,8 +10,6 @@
  box-sizing: border-box; 
  -webkit-backface-visibility: hidden; 
  -moz-backface-visibility: hidden; 
- -webkit-transform: translate3d(0, 0, 0); 
- -moz-transform: translate3d(0, 0, 0); 
  } 
 
 html { 
@@ -137,48 +135,48 @@ html, body {
  animation: scroll-indicator 2s ease-in-out infinite; 
  } 
 
- .transition-overlay { 
- position:fixed; 
+.transition-overlay { 
+ position: fixed; 
  top: 0; 
  left: 0; 
  width: 100%; 
  height: 100vh; 
  display: flex; 
  pointer-events: none; 
- z-index: 2; 
- } 
+ z-index: 999998; /* 2에서 999998로 변경 */
+} 
 
- .blocker { 
- flex:1; 
+.blocker { 
+ flex: 1; 
  height: 100%; 
  background-color: #232225; 
  transform: scaleX(0); 
  transform-origin: left; 
- } 
+} 
 
- .logo-overlay { 
+.logo-overlay { 
  position: fixed; 
  top: 0; 
  left: 0; 
  width: 100vw; 
  height: 100svh; 
- z-index: 2; 
+ z-index: 999999; /* 2에서 999999로 변경 - 가장 위 */
  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #232225;
-  pointer-events: none;
-  opacity: 0;
- } 
+ align-items: center;
+ justify-content: center;
+ background-color: #232225;
+ pointer-events: none;
+ opacity: 0;
+} 
 
- .logo-container{
-  width: 400px;
-  height: 400px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
- }
+.logo-container {
+ width: 400px;
+ height: 400px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ padding: 40px;
+}
 
 
 /* Hero Text Sequential Animation */
@@ -313,7 +311,47 @@ a:focus-visible {
  transition-duration: 0.01ms !important; 
  } 
  } 
- [data-motion] { 
+[data-motion] { 
  will-change: transform; 
+ -webkit-transform: translate3d(0, 0, 0); 
+ -moz-transform: translate3d(0, 0, 0); 
  transform: translateZ(0); 
+ } 
+
+/* ScrollToTop - 최우선 viewport 고정 */
+.scroll-to-top-wrapper { 
+ position: fixed !important; 
+ bottom: 2rem !important; 
+ right: 2rem !important; 
+ display: flex !important; 
+ flex-direction: column !important; 
+ gap: 0.75rem !important; 
+ z-index: 999999 !important; 
+ pointer-events: auto !important; 
+ } 
+
+.scroll-to-top-button { 
+ width: 48px !important; 
+ height: 48px !important; 
+ background-color: #000 !important; 
+ color: #fff !important; 
+ border: none !important; 
+ cursor: pointer !important; 
+ box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important; 
+ transition: all 0.3s ease-in-out !important; 
+ display: flex !important; 
+ align-items: center !important; 
+ justify-content: center !important; 
+ opacity: 0 !important; 
+ pointer-events: none !important; 
+ } 
+
+.scroll-to-top-button.visible { 
+ opacity: 1 !important; 
+ pointer-events: auto !important; 
+ } 
+
+.scroll-to-top-button:hover { 
+ background-color: #374151 !important; 
+ box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important; 
  } 
