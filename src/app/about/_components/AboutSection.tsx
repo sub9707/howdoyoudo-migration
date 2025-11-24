@@ -9,7 +9,7 @@ export default function AboutSection() {
     return new Date().getFullYear() - 2005;
   }
   return (
-    <section className="py-40">
+    <section className="pb-40">
       <div className="max-w-7xl mx-auto px-6 space-y-32">
 
         <AboutCard

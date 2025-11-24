@@ -13,7 +13,7 @@ export default function AboutPage() {
       </section>
 
       {/* Banner */}
-      <section className="py-28">
+      <section className="pb-28">
         <AboutBanner height="750px" />
       </section>
 
