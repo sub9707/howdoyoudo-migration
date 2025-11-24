@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState, useRef } from 'react';
+import Image from 'next/image';
 
 interface AboutCardProps {
   title: string;
@@ -11,6 +12,7 @@ interface AboutCardProps {
   reverse?: boolean;
   gradientFrom?: string;
   gradientTo?: string;
+  backgroundImage?: string;
 }
 
 export default function AboutCard({
@@ -21,7 +23,24 @@ export default function AboutCard({
   reverse = false,
   gradientFrom = '#0F172A',
   gradientTo = '#1E293B',
+  backgroundImage,
 }: AboutCardProps) {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    
+    setMousePosition({ x, y });
+  };
+
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => setIsHovered(false);
   return (
     <motion.div
       initial={{ opacity: 0, y: 80 }}
@@ -33,23 +52,48 @@ export default function AboutCard({
       }`}
     >
       <motion.div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         whileHover={{ 
           scale: 1.03,
           rotateY: reverse ? -2 : 2,
         }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
-        className="relative w-full lg:w-[480px] h-[500px] overflow-hidden"
+        className="relative w-full lg:w-[480px] h-[500px] overflow-hidden cursor-pointer"
         style={{
           perspective: '1000px',
           transformStyle: 'preserve-3d',
         }}
       >
+        {/* Background Image with Grayscale Filter */}
+        {backgroundImage && (
+          <div className="absolute inset-0">
+            <Image
+              src={backgroundImage}
+              alt={title}
+              fill
+              className="object-cover"
+              style={{
+                filter: 'grayscale(100%)',
+              }}
+              sizes="480px"
+              priority
+            />
+          </div>
+        )}
+
+        {/* Navy Gradient Overlay */}
         <div 
-          className="absolute inset-0"
+          className="absolute inset-0 z-10"
           style={{
-            background: `linear-gradient(135deg, ${gradientFrom} 0%, ${gradientTo} 100%)`,
+            background: backgroundImage 
+              ? `linear-gradient(135deg, ${gradientFrom}cc 0%, ${gradientTo}e6 100%)`
+              : `linear-gradient(135deg, ${gradientFrom} 0%, ${gradientTo} 100%)`,
           }}
         >
+          {/* Grid Pattern */}
           <div 
             className="absolute inset-0 opacity-5"
             style={{
@@ -62,6 +106,16 @@ export default function AboutCard({
           />
         </div>
 
+        {/* Mouse-Following Glossy Effect */}
+        <div
+          className="absolute inset-0 z-[15] pointer-events-none transition-opacity duration-300"
+          style={{
+            opacity: isHovered ? 1 : 0,
+            background: `radial-gradient(circle 250px at ${mousePosition.x}% ${mousePosition.y}%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 40%, transparent 70%)`,
+          }}
+        />
+
+        {/* Floating Decoration */}
         <motion.div
           animate={{ 
             y: [0, -20, 0],
@@ -72,13 +126,13 @@ export default function AboutCard({
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="absolute top-8 right-8 w-32 h-32 opacity-10"
+          className="absolute top-8 right-8 w-32 h-32 opacity-10 z-[25]"
         >
           <div className="w-full h-full border-4 border-white transform rotate-45" />
         </motion.div>
 
         {/* Content Overlay */}
-        <div className="relative z-10 h-full flex flex-col justify-between p-12">
+        <div className="relative z-[25] h-full flex flex-col justify-between p-12 pointer-events-none">
           {/* Top Section - Title */}
           <div>
             <motion.div
@@ -108,7 +162,7 @@ export default function AboutCard({
 
         {/* 3D Shadow Effect */}
         <div 
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none z-[30]"
           style={{
             boxShadow: reverse 
               ? 'inset -8px 0 24px rgba(0,0,0,0.3)' 

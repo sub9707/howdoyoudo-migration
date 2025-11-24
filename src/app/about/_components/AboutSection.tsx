@@ -25,8 +25,9 @@ export default function AboutSection() {
             '시작부터 함께합니다.',
             '하우두유두 전문가들이 귀사의 성공적인 브랜딩을 이끌 것입니다.',
           ]}
-          gradientFrom="#0F172A"
-          gradientTo="#334155"
+          gradientFrom="#172036"
+          gradientTo="#0e1b2b"
+          backgroundImage="/images/about-no1-bg.jpg"
         />
 
         <Divider />
@@ -44,8 +45,9 @@ export default function AboutSection() {
             '적은 광고비로도 목표를 정확히 적중시키는 통쾌한 쌍방향 커뮤니케이션으로,',
             '귀사의 든든한 동반자가 되어 책임 있는 사명감을 성실히 수행하겠습니다.',
           ]}
-          gradientFrom="#1E293B"
-          gradientTo="#475569"
+          gradientFrom="#0e1b2b"
+          gradientTo="#172036"
+          backgroundImage="/images/about-best-bg.jpg"
           reverse
         />
 
