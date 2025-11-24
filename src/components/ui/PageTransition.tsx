@@ -16,7 +16,7 @@ function PageTransition({ children }: { children: React.ReactNode }) {
     const isTransitioning = useRef(false);
 
     // -------------------------------
-    // Cover Page (Exit Animation)
+    // Cover Page (Exit Animation) - 시간 단축
     // -------------------------------
     const coverPage = (url: string) => {
         // 스크롤 막기
@@ -26,21 +26,21 @@ function PageTransition({ children }: { children: React.ReactNode }) {
             onComplete: () => router.push(url)
         });
 
-        // 블록 애니메이션
+        // 블록 애니메이션 - 0.4s -> 0.3s
         tl.to(blocksRef.current, {
             scaleX: 1,
-            stagger: 0.02,
-            duration: 0.4,
+            stagger: 0.015, // 0.02 -> 0.015
+            duration: 0.3, // 0.4 -> 0.3
             ease: "power2.inOut",
             transformOrigin: "left",
         });
 
         // 로고 오버레이 표시
         if (logoOverlayRef.current) {
-            tl.set(logoOverlayRef.current, { opacity: 1 }, "-=0.2");
+            tl.set(logoOverlayRef.current, { opacity: 1 }, "-=0.15"); // -=0.2 -> -=0.15
         }
 
-        // 로고 path 애니메이션
+        // 로고 path 애니메이션 - 2s -> 1s, 1s -> 0.5s
         if (logoRef.current) {
             const paths = logoRef.current.querySelectorAll("path");
 
@@ -53,54 +53,54 @@ function PageTransition({ children }: { children: React.ReactNode }) {
                         strokeDashoffset: length,
                         fill: "transparent",
                     },
-                    "-=0.25"
+                    "-=0.2" // -=0.25 -> -=0.2
                 );
 
                 tl.to(
                     p,
                     {
                         strokeDashoffset: 0,
-                        duration: 2,
+                        duration: 1, // 2 -> 1
                         ease: "power2.inOut",
                     },
-                    "-=0.5"
+                    "-=0.4" // -=0.5 -> -=0.4
                 );
 
                 tl.to(
                     p,
                     {
                         fill: "#e3e4d8",
-                        duration: 1,
+                        duration: 0.5, // 1 -> 0.5
                         ease: "power2.inOut",
                     },
-                    "-=0.5"
+                    "-=0.3" // -=0.5 -> -=0.3
                 );
             });
         }
 
-        // 로고가 완성된 후 0.5초 대기
-        tl.to({}, { duration: 0.5 });
+        // 로고가 완성된 후 대기 시간 - 0.5s -> 0.3s
+        tl.to({}, { duration: 0.3 }); // 0.5 -> 0.3
 
-        // 로고 오버레이 사라짐
+        // 로고 오버레이 사라짐 - 1.2s -> 0.6s
         if (logoOverlayRef.current) {
             tl.to(logoOverlayRef.current, {
                 opacity: 0,
-                duration: 1.2,
+                duration: 0.6, // 1.2 -> 0.6
                 ease: "power2.inOut",
             });
         }
     };
 
     // -------------------------------
-    // Reveal Page (Enter Animation)
+    // Reveal Page (Enter Animation) - 시간 단축
     // -------------------------------
     const revealPage = () => {
         gsap.set(blocksRef.current, { scaleX: 1, transformOrigin: "right" });
 
         gsap.to(blocksRef.current, {
             scaleX: 0,
-            duration: 0.4,
-            stagger: 0.02,
+            duration: 0.3, // 0.4 -> 0.3
+            stagger: 0.015, // 0.02 -> 0.015
             ease: "power2.inOut",
             transformOrigin: "right",
             onComplete: () => {

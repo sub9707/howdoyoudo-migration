@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 interface WorkItem {
   category: string
@@ -223,9 +224,9 @@ export default function ImageGallery() {
           })}
         </div>
 
-        {/* Load More Button */}
+        {/* Load More Button - Link로 변경 */}
         <div className="text-center mt-20">
-          <button className="group inline-flex items-center px-10 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-full hover:border-gray-900 hover:text-gray-900 hover:shadow-lg transition-all duration-300 tracking-wide">
+          <Link href="/works" className="group inline-flex items-center px-10 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-full hover:border-gray-900 hover:text-gray-900 hover:shadow-lg transition-all duration-300 tracking-wide">
             <span>VIEW ALL WORKS</span>
             <svg 
               className="ml-3 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" 
@@ -235,7 +236,7 @@ export default function ImageGallery() {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
-          </button>
+          </Link>
         </div>
       </div>
     </section>

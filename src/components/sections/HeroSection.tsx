@@ -1,12 +1,11 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { useRouter } from "next/navigation";
+import Link from 'next/link'
 
 export default function HeroSection() {
   const heroRef = useRef<HTMLElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
-  const navigate = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,11 +22,7 @@ export default function HeroSection() {
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, []);
-
-  const handleCTAClick = () => {
-    navigate.push('/works');
-  };
+  }, [])
 
   return (
     <section 
@@ -61,12 +56,12 @@ export default function HeroSection() {
           성공적인 BTL 마케팅을 위한 One-Stop 파트너
         </p>
 
-        {/* CTA Button */}
+        {/* CTA Button - Link로 변경 */}
         <div className="hero-button mt-12">
-          <button onClick={handleCTAClick} className="group relative px-8 py-4 cursor-pointer bg-gray-900 text-white rounded-full font-medium text-lg transition-all duration-300 hover:bg-gray-800 hover:shadow-xl hover:scale-105">
+          <Link href="/works" className="group relative inline-block px-8 py-4 cursor-pointer bg-gray-900 text-white rounded-full font-medium text-lg transition-all duration-300 hover:bg-gray-800 hover:shadow-xl hover:scale-105">
             <span className="relative z-10">Our Works</span>
             <div className="absolute inset-0 bg-gradient-to-r from-gray-800 to-gray-900 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </button>
+          </Link>
         </div>
       </div>
 

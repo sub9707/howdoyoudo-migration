@@ -13,12 +13,12 @@ export default function Footer() {
 
   const businessFields = [
     'BTL Promotion',
-    '컨설팅체어스',
-    '멀업스토어',
+    '런칭쇼케이스',
+    '팝업스토어',
     '스타일링클래스',
     '에이전시',
-    '진시',
-    '투터클래스',
+    '전시',
+    '뷰티클래스',
     '패션쇼',
     'CSR'
   ]
