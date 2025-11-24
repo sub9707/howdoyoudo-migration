@@ -1,10 +1,9 @@
-// src/components/layout/Header.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
-import TransitionLink from './TransitionLink'
+import Link from 'next/link'
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -36,18 +35,18 @@ export default function Header() {
       >
         <div className="w-full px-16 sm:px-20 lg:px-32 xl:px-40">
           <div className="flex items-center justify-between h-20">
-            <TransitionLink
+            <Link
               href="/"
               className={`text-2xl font-bold tracking-wider transition-colors ${
                 isScrolled ? 'text-gray-900' : 'text-gray-900'
               }`}
             >
               HOWDOYOUDO
-            </TransitionLink>
+            </Link>
 
             <nav className="hidden md:flex items-center space-x-12">
               {navItems.map((item) => (
-                <TransitionLink
+                <Link
                   key={item.href}
                   href={item.href}
                   className={`text-sm font-medium tracking-wide transition-all duration-300 relative group ${
@@ -62,7 +61,7 @@ export default function Header() {
                       pathname === item.href ? 'w-full' : 'w-0 group-hover:w-full'
                     }`}
                   />
-                </TransitionLink>
+                </Link>
               ))}
             </nav>
 
@@ -99,7 +98,7 @@ export default function Header() {
 
           <nav className="space-y-6">
             {navItems.map((item) => (
-              <TransitionLink
+              <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsMenuOpen(false)}
@@ -108,7 +107,7 @@ export default function Header() {
                 }`}
               >
                 {item.label}
-              </TransitionLink>
+              </Link>
             ))}
           </nav>
         </div>

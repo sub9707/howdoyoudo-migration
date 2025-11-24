@@ -11,7 +11,7 @@ export default function Page() {
             <main className="flex-1 container mx-auto px-4 py-16">
                 <div className="flex flex-col lg:flex-row">
                     {/* Left: Contact Information */}
-                    <div className="lg:w-1/2 h-120 flex flex-col justify-center items-center  bg-gray-800 text-white p-8">
+                    <div className="lg:w-1/2 h-120 flex flex-col justify-center items-center  bg-[#232225] text-white p-8">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                             {/* Address */}
                             <div className="text-center">

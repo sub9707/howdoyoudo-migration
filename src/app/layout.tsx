@@ -3,11 +3,10 @@ import { Inter } from 'next/font/google'
 import { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import PageTransition from '@/components/layout/PageTransition'
-import { TransitionProvider } from '@/context/TransitionContext'
 import '../styles/globals.css'
+import PageTransition from '@/components/ui/PageTransition'
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter'
@@ -29,15 +28,13 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${inter.variable} scroll-smooth`}>
       <body className="font-sans antialiased bg-gray-50 text-gray-900">
-        <TransitionProvider>
+        <PageTransition>
           <div className="min-h-screen">
             <Header />
-            <PageTransition>
-              <main>{children}</main>
-            </PageTransition>
+            <main>{children}</main>
             <Footer />
           </div>
-        </TransitionProvider>
+        </PageTransition>
       </body>
     </html>
   )

@@ -137,6 +137,49 @@ html, body {
  animation: scroll-indicator 2s ease-in-out infinite; 
  } 
 
+ .transition-overlay { 
+ position:fixed; 
+ top: 0; 
+ left: 0; 
+ width: 100%; 
+ height: 100vh; 
+ display: flex; 
+ pointer-events: none; 
+ z-index: 2; 
+ } 
+
+ .blocker { 
+ flex:1; 
+ height: 100%; 
+ background-color: #232225; 
+ transform: scaleX(0); 
+ transform-origin: left; 
+ } 
+
+ .logo-overlay { 
+ position: fixed; 
+ top: 0; 
+ left: 0; 
+ width: 100vw; 
+ height: 100svh; 
+ z-index: 2; 
+ display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #232225;
+  pointer-events: none;
+  opacity: 0;
+ } 
+
+ .logo-container{
+  width: 400px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+ }
+
 
 /* Hero Text Sequential Animation */
 .hero-text-line-1 { 
@@ -270,7 +313,7 @@ a:focus-visible {
  transition-duration: 0.01ms !important; 
  } 
  } 
- [data-motion] {
-  will-change: transform;
-  transform: translateZ(0);
-}
+ [data-motion] { 
+ will-change: transform; 
+ transform: translateZ(0); 
+ } 

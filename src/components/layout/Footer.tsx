@@ -1,7 +1,6 @@
-// src/components/layout/Footer.tsx의 Link를 TransitionLink로 변경
 'use client';
 
-import TransitionLink from './TransitionLink'
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export default function Footer() {
@@ -82,13 +81,13 @@ export default function Footer() {
               </h4>
               <nav className="space-y-3">
                 {navItems.map((item) => (
-                  <TransitionLink
+                  <Link
                     key={item.href}
                     href={item.href}
                     className="block text-sm text-gray-600 hover:text-gray-900 transition-colors duration-300"
                   >
                     {item.label}
-                  </TransitionLink>
+                  </Link>
                 ))}
               </nav>
             </div>
@@ -101,18 +100,18 @@ export default function Footer() {
               </p>
 
               <div className="flex space-x-6">
-                <TransitionLink
+                <Link
                   href="/privacy"
                   className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
                 >
                   Privacy Policy
-                </TransitionLink>
-                <TransitionLink
+                </Link>
+                <Link
                   href="/terms"
                   className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
                 >
                   Terms of Service
-                </TransitionLink>
+                </Link>
               </div>
             </div>
           </div>
