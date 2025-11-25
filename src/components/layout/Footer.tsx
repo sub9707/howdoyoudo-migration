@@ -7,7 +7,8 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const pathname = usePathname();
 
-  if (pathname.startsWith("/dashboard")) {
+  // Dashboard와 Admin 페이지에서는 푸터 숨김
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/admin")) {
     return null;
   }
 

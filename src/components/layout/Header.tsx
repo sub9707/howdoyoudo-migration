@@ -16,7 +16,8 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  if (pathname.startsWith("/dashboard")) return null;
+  // Dashboard와 Admin 페이지에서는 헤더 숨김
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/admin")) return null;
 
   const navItems = [
     { href: '/', label: 'MAIN' },
