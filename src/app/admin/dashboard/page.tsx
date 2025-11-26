@@ -2,13 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { 
   LogOut, 
-  User, 
-  Activity, 
-  Shield, 
-  Clock,
-  Monitor
+  Shield,
+  FileText,
+  Plus,
+  Eye,
+  Calendar,
 } from 'lucide-react';
 
 interface AdminInfo {
@@ -20,13 +21,29 @@ interface AdminInfo {
   login_count: number;
 }
 
+interface WorksStats {
+  totalWorks: number;
+  activeWorks: number;
+  totalViews: number;
+  recentWorks: {
+    id: number;
+    title: string;
+    category_display_name: string;
+    event_date: string;
+    view_count: number;
+    is_active: boolean;
+  }[];
+}
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [adminInfo, setAdminInfo] = useState<AdminInfo | null>(null);
+  const [stats, setStats] = useState<WorksStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchAdminInfo();
+    fetchStats();
   }, []);
 
   const fetchAdminInfo = async () => {
@@ -47,6 +64,19 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('/api/admin/works/stats');
+      const data = await response.json();
+
+      if (data.success) {
+        setStats(data.data);
+      }
+    } catch (error) {
+      console.error('통계 로드 오류:', error);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await fetch('/api/admin/auth/logout', {
@@ -59,14 +89,11 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleString('ko-KR', {
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
     });
   };
 
@@ -98,7 +125,7 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="text-right">
+              <div className="text-right hidden sm:block">
                 <p className="text-sm font-medium text-gray-900">
                   {adminInfo?.name}
                 </p>
@@ -109,7 +136,7 @@ export default function AdminDashboardPage() {
                 className="flex items-center space-x-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
-                <span>로그아웃</span>
+                <span className="hidden sm:inline">로그아웃</span>
               </button>
             </div>
           </div>
@@ -124,50 +151,63 @@ export default function AdminDashboardPage() {
             환영합니다, {adminInfo?.name}님!
           </h2>
           <p className="text-gray-300">
-            HOWDOYOUDO 관리자 페이지에 오신 것을 환영합니다.
+            HOWDOYOUDO Works 관리 시스템
           </p>
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <h3 className="text-xl font-bold text-gray-900 mb-4">빠른 작업</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button
-              onClick={() => router.push('/')}
-              className="p-4 border-2 border-gray-200 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-all text-left"
-            >
-              <h4 className="font-semibold text-gray-900 mb-1">
-                홈페이지로 이동
-              </h4>
-              <p className="text-sm text-gray-600">
-                메인 사이트 확인하기
-              </p>
-            </button>
+        {/* Stats Cards */}
+        {stats && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-gray-600">전체 게시글</h3>
+                <FileText className="w-5 h-5 text-gray-400" />
+              </div>
+              <p className="text-3xl font-bold text-gray-900">{stats.totalWorks}</p>
+            </div>
 
-            <button
-              onClick={() => router.push('/works')}
-              className="p-4 border-2 border-gray-200 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-all text-left"
-            >
-              <h4 className="font-semibold text-gray-900 mb-1">
-                작업 관리
-              </h4>
-              <p className="text-sm text-gray-600">
-                포트폴리오 관리하기
-              </p>
-            </button>
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-gray-600">활성 게시글</h3>
+                <Eye className="w-5 h-5 text-gray-400" />
+              </div>
+              <p className="text-3xl font-bold text-gray-900">{stats.activeWorks}</p>
+            </div>
 
-            <button
-              onClick={() => router.push('/contact')}
-              className="p-4 border-2 border-gray-200 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-all text-left"
-            >
-              <h4 className="font-semibold text-gray-900 mb-1">
-                문의 확인
-              </h4>
-              <p className="text-sm text-gray-600">
-                고객 문의 관리하기
-              </p>
-            </button>
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-gray-600">총 조회수</h3>
+                <Eye className="w-5 h-5 text-gray-400" />
+              </div>
+              <p className="text-3xl font-bold text-gray-900">{stats.totalViews.toLocaleString()}</p>
+            </div>
           </div>
+        )}
+
+        {/* Menu Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Works 관리 카드 */}
+          <Link
+            href="/admin/works"
+            className="group bg-white rounded-xl border-2 border-gray-200 p-8 hover:border-gray-900 hover:shadow-lg transition-all duration-300"
+          >
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-gray-900 transition-colors">
+                <FileText className="w-8 h-8 text-gray-600 group-hover:text-white transition-colors" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Works 관리
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                포트폴리오 게시글을 관리합니다
+              </p>
+              <div className="flex items-center space-x-4 text-sm text-gray-500">
+                <span>전체 {stats?.totalWorks || 0}개</span>
+                <span>•</span>
+                <span>활성 {stats?.activeWorks || 0}개</span>
+              </div>
+            </div>
+          </Link>
         </div>
       </main>
     </div>

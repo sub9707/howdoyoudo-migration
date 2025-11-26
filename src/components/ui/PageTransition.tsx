@@ -38,7 +38,7 @@ function PageTransition({ children }: { children: React.ReactNode }) {
             const paths = logoRef.current.querySelectorAll("path");
 
             paths.forEach((p) => {
-                const length = p.getTotalLength();
+                const length = (p as SVGPathElement).getTotalLength();
 
                 tl.set(
                     p,
@@ -118,7 +118,7 @@ function PageTransition({ children }: { children: React.ReactNode }) {
         if (logoRef.current) {
             const paths = logoRef.current.querySelectorAll("path");
             paths.forEach((p) => {
-                const length = p.getTotalLength();
+                const length = (p as SVGPathElement).getTotalLength();
                 gsap.set(p, {
                     strokeDasharray: length,
                     strokeDashoffset: length,
@@ -135,7 +135,38 @@ function PageTransition({ children }: { children: React.ReactNode }) {
             coverPage(url);
         };
 
+        const resetAnyAnimationsAndState = () => {
+            // 현재 진행중인 tweens 즉시 중지하고 상태를 기본으로 되돌림
+            try {
+                if (blocksRef.current.length) {
+                    gsap.killTweensOf(blocksRef.current);
+                    gsap.set(blocksRef.current, { scaleX: 0, transformOrigin: "left" });
+                }
+
+                if (logoRef.current) {
+                    const paths = Array.from(logoRef.current.querySelectorAll("path"));
+                    if (paths.length) {
+                        gsap.killTweensOf(paths);
+                        paths.forEach((p) => {
+                            gsap.set(p, { strokeDashoffset: 0, fill: "transparent" });
+                        });
+                    }
+                }
+
+                if (logoOverlayRef.current) {
+                    gsap.killTweensOf(logoOverlayRef.current);
+                    gsap.set(logoOverlayRef.current, { opacity: 0 });
+                }
+            } catch (err) {
+                // 안전하게 실패 무시
+                // console.warn("resetAnyAnimationsAndState failed", err);
+            }
+            isTransitioning.current = false;
+            document.body.style.overflow = "";
+        };
+
         const handleClick = (e: Event) => {
+            // 이 핸들러는 각 링크에 직접 바인딩됨 (querySelectorAll 사용)
             e.preventDefault();
 
             const target = e.currentTarget as HTMLAnchorElement | null;
@@ -144,9 +175,27 @@ function PageTransition({ children }: { children: React.ReactNode }) {
             const href = target.href;
             const url = new URL(href).pathname;
 
-            if (url !== pathname) {
-                handleRouteChange(url);
+            // 같은 경로면 무시
+            if (url === pathname) return;
+
+            // **여기서 핵심: data-no-transition 검사**
+            const noTransitionAttr = target.getAttribute("data-no-transition");
+            const noTransitionDataset = (target.dataset && target.dataset.noTransition) || null;
+            const shouldSkip = noTransitionAttr === "true" || noTransitionDataset === "true";
+
+            if (shouldSkip) {
+                // 진행중인 애니메이션 정리 -> 화면에 transition 끝부분만 보이는 문제 방지
+                resetAnyAnimationsAndState();
+
+                // 즉시 라우팅 (transition 없이)
+                router.push(url);
+                return;
             }
+
+            // 기본 동작: 트랜지션 실행
+            if (isTransitioning.current) return;
+            isTransitioning.current = true;
+            coverPage(url);
         };
 
         const links = document.querySelectorAll<HTMLAnchorElement>('a[href^="/"]');
