@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { WorkItem, WorksResponse } from '@/types/works';
+import { WorkItem, WorksResponse, CategoryInfo } from '@/types/works';
 import WorksFilter from './WorksFilter';
 import WorksGrid from './WorksGrid';
 
@@ -11,8 +11,9 @@ interface WorksClientProps {
 
 export default function WorksClient({ initialData }: WorksClientProps) {
   const [works, setWorks] = useState<WorkItem[]>(initialData.works);
-  const [categories] = useState<string[]>(initialData.categories);
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [categories] = useState<CategoryInfo[]>(initialData.categories);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [selectedYear, setSelectedYear] = useState<'recent' | 'previous' | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialData.hasMore);
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,9 +24,20 @@ export default function WorksClient({ initialData }: WorksClientProps) {
     
     setLoading(true);
     try {
-      const response = await fetch(
-        `/api/works?page=${currentPage + 1}&limit=21&category=${selectedCategory}`
-      );
+      const params = new URLSearchParams({
+        page: (currentPage + 1).toString(),
+        limit: '21',
+      });
+
+      if (selectedCategoryId !== null) {
+        params.append('categoryId', selectedCategoryId.toString());
+      }
+
+      if (selectedYear) {
+        params.append('year', selectedYear);
+      }
+
+      const response = await fetch(`/api/works?${params.toString()}`);
       
       if (response.ok) {
         const data: WorksResponse = await response.json();
@@ -38,18 +50,68 @@ export default function WorksClient({ initialData }: WorksClientProps) {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, selectedCategory, loading, hasMore]);
+  }, [currentPage, selectedCategoryId, selectedYear, loading, hasMore]);
 
   // Handle category filter
-  const handleCategoryChange = async (category: string) => {
-    if (category === selectedCategory) return;
+  const handleCategoryChange = async (categoryId: number | null) => {
+    if (categoryId === selectedCategoryId) return;
     
-    setSelectedCategory(category);
+    setSelectedCategoryId(categoryId);
     setLoading(true);
     setCurrentPage(1);
     
     try {
-      const response = await fetch(`/api/works?page=1&limit=21&category=${category}`);
+      const params = new URLSearchParams({
+        page: '1',
+        limit: '21',
+      });
+
+      if (categoryId !== null) {
+        params.append('categoryId', categoryId.toString());
+      }
+
+      if (selectedYear) {
+        params.append('year', selectedYear);
+      }
+
+      const response = await fetch(`/api/works?${params.toString()}`);
+      
+      if (response.ok) {
+        const data: WorksResponse = await response.json();
+        setWorks(data.works);
+        setHasMore(data.hasMore);
+        setCurrentPage(1);
+      }
+    } catch (error) {
+      console.error('Error filtering works:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle year filter
+  const handleYearChange = async (year: 'recent' | 'previous' | null) => {
+    if (year === selectedYear) return;
+    
+    setSelectedYear(year);
+    setLoading(true);
+    setCurrentPage(1);
+    
+    try {
+      const params = new URLSearchParams({
+        page: '1',
+        limit: '21',
+      });
+
+      if (selectedCategoryId !== null) {
+        params.append('categoryId', selectedCategoryId.toString());
+      }
+
+      if (year) {
+        params.append('year', year);
+      }
+
+      const response = await fetch(`/api/works?${params.toString()}`);
       
       if (response.ok) {
         const data: WorksResponse = await response.json();
@@ -84,8 +146,10 @@ export default function WorksClient({ initialData }: WorksClientProps) {
       {/* Filter Section */}
       <WorksFilter 
         categories={categories}
-        selectedCategory={selectedCategory}
+        selectedCategoryId={selectedCategoryId}
+        selectedYear={selectedYear}
         onCategoryChange={handleCategoryChange}
+        onYearChange={handleYearChange}
       />
       
       {/* Works Grid */}

@@ -26,7 +26,7 @@ async function getInitialData(): Promise<WorksResponse> {
     return {
       works: [],
       totalCount: 0,
-      categories: ['All'],
+      categories: [],
       hasMore: false,
       currentPage: 1
     };
