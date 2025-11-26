@@ -1,3 +1,4 @@
+// src/components/sections/ImageGallery.tsx
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
@@ -155,10 +156,11 @@ export default function ImageGallery() {
           ref={galleryRef}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12"
         >
-          {works.map((item, index) => {
+          {works.map((item) => {
             return (
-              <div
+              <Link
                 key={item.id}
+                href={`/works/${item.id}`}
                 className="gallery-item group cursor-pointer opacity-0 translate-y-12 transition-all duration-700 ease-out"
               >
                 <div className="relative overflow-hidden rounded-2xl bg-gray-100 aspect-[4/5] mb-6 shadow-lg hover:shadow-2xl transition-shadow duration-500">
@@ -174,14 +176,14 @@ export default function ImageGallery() {
                   {/* Image overlay */}
                   <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   
-                  {/* Category Badge (흰색) */}
+                  {/* Category Badge */}
                   <div className="absolute top-6 left-6 z-10">
                     <span className="inline-block px-4 py-2 bg-white text-gray-900 text-xs font-semibold rounded-full tracking-wide shadow-md">
                       {item.categoryDisplayName}
                     </span>
                   </div>
 
-                  {/* Hover Content - 타이틀과 행사년도 */}
+                  {/* Hover Content */}
                   <div className="absolute inset-0 flex items-end p-6 z-10">
                     <div className="transform translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-100">
                       <h3 className="text-xl font-bold text-white mb-2">
@@ -208,7 +210,7 @@ export default function ImageGallery() {
                     {item.categoryDisplayName}
                   </p>
                 </div>
-              </div>
+              </Link>
             )
           })}
         </div>

@@ -2,6 +2,7 @@
 
 import { WorkItem } from '@/types/works';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface WorksGridProps {
     works: WorkItem[];
@@ -11,7 +12,7 @@ interface WorksGridProps {
 
 function WorkCard({ work }: { work: WorkItem }) {
     return (
-        <div className="group block">
+        <Link href={`/works/${work.id}`} data-no-transition="true" className="group block">
             <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-gray-100 shadow-sm hover:shadow-lg transition-all duration-300">
                 {/* 썸네일 이미지 */}
                 <Image
@@ -41,7 +42,7 @@ function WorkCard({ work }: { work: WorkItem }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }
 
