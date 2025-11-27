@@ -38,12 +38,10 @@ interface WorksStats {
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [adminInfo, setAdminInfo] = useState<AdminInfo | null>(null);
-  const [stats, setStats] = useState<WorksStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchAdminInfo();
-    fetchStats();
   }, []);
 
   const fetchAdminInfo = async () => {
@@ -61,19 +59,6 @@ export default function AdminDashboardPage() {
       router.push('/admin/login');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchStats = async () => {
-    try {
-      const response = await fetch('/api/admin/works/stats');
-      const data = await response.json();
-
-      if (data.success) {
-        setStats(data.data);
-      }
-    } catch (error) {
-      console.error('통계 로드 오류:', error);
     }
   };
 
@@ -155,34 +140,6 @@ export default function AdminDashboardPage() {
           </p>
         </div>
 
-        {/* Stats Cards */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-600">전체 게시글</h3>
-                <FileText className="w-5 h-5 text-gray-400" />
-              </div>
-              <p className="text-3xl font-bold text-gray-900">{stats.totalWorks}</p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-600">활성 게시글</h3>
-                <Eye className="w-5 h-5 text-gray-400" />
-              </div>
-              <p className="text-3xl font-bold text-gray-900">{stats.activeWorks}</p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-600">총 조회수</h3>
-                <Eye className="w-5 h-5 text-gray-400" />
-              </div>
-              <p className="text-3xl font-bold text-gray-900">{stats.totalViews.toLocaleString()}</p>
-            </div>
-          </div>
-        )}
 
         {/* Menu Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -199,13 +156,8 @@ export default function AdminDashboardPage() {
                 Works 관리
               </h3>
               <p className="text-sm text-gray-600 mb-4">
-                포트폴리오 게시글을 관리합니다
+                works 게시글을 관리합니다
               </p>
-              <div className="flex items-center space-x-4 text-sm text-gray-500">
-                <span>전체 {stats?.totalWorks || 0}개</span>
-                <span>•</span>
-                <span>활성 {stats?.activeWorks || 0}개</span>
-              </div>
             </div>
           </Link>
         </div>

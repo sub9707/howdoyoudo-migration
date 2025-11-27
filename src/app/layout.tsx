@@ -5,7 +5,6 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import ScrollToTop from '@/components/ui/ScrollToTop'
 import '../styles/globals.css'
-import PageTransition from '@/components/ui/PageTransition'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -29,13 +28,11 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${inter.variable} scroll-smooth`}>
       <body className="font-sans antialiased bg-gray-50 text-gray-900">
-        <PageTransition>
           <div className="min-h-screen">
             <Header />
             <main>{children}</main>
             <Footer />
           </div>
-        </PageTransition>
         
         <ScrollToTop />
       </body>
