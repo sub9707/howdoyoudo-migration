@@ -1,20 +1,21 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import Image from 'next/image';
 import {
-  Plus,
-  Search,
+  Eye,
+  EyeOff,
   Edit,
   Trash2,
-  Eye,
+  Plus,
+  Calendar,
+  Tag,
+  Search,
+  Filter,
   ChevronLeft,
   ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
 } from 'lucide-react';
+import Image from 'next/image';
 
 interface Work {
   id: number;
@@ -42,138 +43,75 @@ export default function AdminWorksPage() {
   const [works, setWorks] = useState<Work[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [editingWorkId, setEditingWorkId] = useState<number | null>(null);
-  const [editingCategory, setEditingCategory] = useState<number>(0);
-  const [popupPosition, setPopupPosition] = useState<{ top: number; left: number } | null>(null);
+  const [hasMore, setHasMore] = useState(false);
 
-  // 검색어 디바운싱
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-      setCurrentPage(1); // 검색 시 첫 페이지로
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [search]);
+  const itemsPerPage = 20;
 
   useEffect(() => {
-    loadCategories();
-  }, []);
+    fetchWorks();
+  }, [selectedCategory, selectedStatus, currentPage]);
 
-  useEffect(() => {
-    loadWorks();
-  }, [currentPage, selectedCategory, debouncedSearch]);
-
-  // 팝업 외부 클릭 시 닫기
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (editingWorkId !== null) {
-        const target = e.target as HTMLElement;
-        if (!target.closest('.category-popup') && !target.closest('.category-badge')) {
-          setEditingWorkId(null);
-          setPopupPosition(null);
-        }
-      }
-    };
-
-    const handleScroll = () => {
-      if (editingWorkId !== null) {
-        setEditingWorkId(null);
-        setPopupPosition(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    window.addEventListener('scroll', handleScroll, true);
-    
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      window.removeEventListener('scroll', handleScroll, true);
-    };
-  }, [editingWorkId]);
-
-  const loadCategories = async () => {
-    try {
-      const response = await fetch('/api/admin/categories');
-      const data = await response.json();
-
-      if (data.success) {
-        setCategories(data.data);
-      }
-    } catch (error) {
-      console.error('카테고리 로드 오류:', error);
-    }
-  };
-
-  const loadWorks = async () => {
+  const fetchWorks = async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
         page: currentPage.toString(),
-        limit: '20',
+        limit: itemsPerPage.toString(),
       });
 
       if (selectedCategory !== 'all') {
         params.append('categoryId', selectedCategory);
       }
 
-      if (debouncedSearch) {
-        params.append('search', debouncedSearch);
+      if (selectedStatus !== 'all') {
+        params.append('isActive', selectedStatus);
       }
 
       const response = await fetch(`/api/admin/works?${params.toString()}`);
       const data = await response.json();
 
       if (data.success) {
-        setWorks(data.data.works);
-        setTotalPages(data.data.totalPages);
-        setTotalCount(data.data.totalCount);
+        setWorks(data.works);
+        setCategories(data.categories);
+        setTotalCount(data.totalCount);
+        setHasMore(data.hasMore);
       }
     } catch (error) {
-      console.error('작업 로드 오류:', error);
+      console.error('Error fetching works:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id: number, title: string) => {
-    if (!confirm(`"${title}" 게시글을 삭제하시겠습니까?`)) {
-      return;
-    }
-
+  const handleToggleActive = async (workId: number, currentStatus: boolean) => {
     try {
-      const response = await fetch(`/api/admin/works/${id}`, {
-        method: 'DELETE',
+      const response = await fetch(`/api/admin/works/${workId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          isActive: !currentStatus,
+        }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        alert('게시글이 삭제되었습니다.');
-        loadWorks();
+        // 작업 목록 새로고침
+        fetchWorks();
       } else {
-        alert(data.error || '삭제에 실패했습니다.');
+        alert(data.error || '상태 변경에 실패했습니다.');
       }
     } catch (error) {
-      console.error('삭제 오류:', error);
-      alert('삭제 중 오류가 발생했습니다.');
+      console.error('Error toggling work status:', error);
+      alert('상태 변경 중 오류가 발생했습니다.');
     }
-  };
-
-  const handleCategoryClick = (workId: number, categoryId: number, event: React.MouseEvent<HTMLButtonElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    setPopupPosition({
-      top: rect.bottom + window.scrollY + 8,
-      left: rect.left + window.scrollX,
-    });
-    setEditingWorkId(workId);
-    setEditingCategory(categoryId);
   };
 
   const handleCategoryChange = async (workId: number, newCategoryId: number) => {
@@ -184,33 +122,53 @@ export default function AdminWorksPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          category_id: newCategoryId,
+          categoryId: newCategoryId,
         }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        setEditingWorkId(null);
-        setPopupPosition(null);
-        loadWorks();
+        // 작업 목록 새로고침
+        fetchWorks();
       } else {
         alert(data.error || '카테고리 변경에 실패했습니다.');
       }
     } catch (error) {
-      console.error('카테고리 변경 오류:', error);
+      console.error('Error changing category:', error);
       alert('카테고리 변경 중 오류가 발생했습니다.');
     }
   };
 
-  const handleCloseCategoryPopup = () => {
-    setEditingWorkId(null);
-    setPopupPosition(null);
+  const handleDelete = async (workId: number, title: string) => {
+    if (!confirm(`"${title}"를 삭제하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/works/${workId}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('작업이 성공적으로 삭제되었습니다.');
+        fetchWorks();
+      } else {
+        alert(data.error || '삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error deleting work:', error);
+      alert('삭제 중 오류가 발생했습니다.');
+    }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ko-KR');
-  };
+  const filteredWorks = works.filter((work) =>
+    work.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -218,55 +176,46 @@ export default function AdminWorksPage() {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/admin/dashboard"
-                className="text-gray-600 hover:text-gray-900"
-              >
-                ← 대시보드
-              </Link>
+            <div>
               <h1 className="text-2xl font-bold text-gray-900">Works 관리</h1>
+              <p className="text-sm text-gray-600 mt-1">
+                총 {totalCount}개의 작업
+              </p>
             </div>
-
-            <Link
-              href="/admin/works/new"
-              className="flex items-center space-x-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              <span>새 게시글</span>
-            </Link>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => router.push('/admin/dashboard')}
+                className="px-4 py-2 text-gray-700 hover:text-gray-900 transition-colors"
+              >
+                대시보드로
+              </button>
+              <button
+                onClick={() => router.push('/admin/works/new')}
+                className="flex items-center space-x-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                <span>새 작업 추가</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Filters */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="flex flex-col md:flex-row gap-4">
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Filters */}
+        <div className="bg-white rounded-xl p-6 mb-6 shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="제목 또는 설명 검색..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                />
-                {search && search !== debouncedSearch && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                  </div>
-                )}
-              </div>
-              {search && (
-                <p className="mt-1 text-xs text-gray-500">
-                  {search === debouncedSearch 
-                    ? `"${search}" 검색 중...` 
-                    : '검색어 입력 대기 중...'}
-                </p>
-              )}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="작업 검색..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+              />
             </div>
 
             {/* Category Filter */}
@@ -276,294 +225,195 @@ export default function AdminWorksPage() {
                 setSelectedCategory(e.target.value);
                 setCurrentPage(1);
               }}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
             >
-              <option value="all">전체 카테고리</option>
+              <option value="all">모든 카테고리</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.display_name}
                 </option>
               ))}
             </select>
+
+            {/* Status Filter */}
+            <select
+              value={selectedStatus}
+              onChange={(e) => {
+                setSelectedStatus(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+            >
+              <option value="all">모든 상태</option>
+              <option value="true">활성화</option>
+              <option value="false">비활성화</option>
+            </select>
           </div>
         </div>
-      </div>
 
-      {/* Works Table */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Works List */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block w-8 h-8 border-4 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 text-gray-600">로딩 중...</p>
+            <div className="w-16 h-16 border-4 border-gray-900 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">로딩 중...</p>
           </div>
-        ) : works.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-            <p className="text-gray-600 mb-4">게시글이 없습니다.</p>
-            <Link
-              href="/admin/works/new"
-              className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              <span>첫 게시글 작성하기</span>
-            </Link>
+        ) : filteredWorks.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500">작업이 없습니다.</p>
           </div>
         ) : (
-          <>
-            {/* Results Info */}
-            <div className="mb-4 text-sm text-gray-600">
-              전체 <span className="font-semibold text-gray-900">{totalCount}</span>개의 게시글
-              {debouncedSearch && ` (검색: "${debouncedSearch}")`}
-            </div>
-
-            {/* Table */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
-                        썸네일
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider max-w-md">
-                        제목
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-48">
-                        카테고리
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
-                        행사 일자
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                        상태
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                        조회수
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
-                        작업
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {works.map((work) => (
-                      <tr key={work.id} className="hover:bg-gray-50 transition-colors">
-                        {/* Thumbnail */}
-                        <td className="px-6 py-4">
-                          <div className="relative w-12 h-12 rounded overflow-hidden bg-gray-100">
-                            <Image
-                              src={work.thumbnail_image}
-                              alt={work.title}
-                              fill
-                              className="object-cover"
-                              sizes="48px"
-                            />
-                          </div>
-                        </td>
-
-                        {/* Title */}
-                        <td className="px-6 py-4">
-                          <div className="max-w-md">
-                            <Link
-                              href={`/admin/works/${work.id}/edit`}
-                              className="font-medium text-gray-900 hover:text-gray-600 block truncate"
-                              title={work.title}
-                            >
-                              {work.title}
-                            </Link>
-                            {work.description && (
-                              <p className="text-sm text-gray-500 truncate mt-1" title={work.description}>
-                                {work.description}
-                              </p>
-                            )}
-                          </div>
-                        </td>
-
-                        {/* Category */}
-                        <td className="px-6 py-4">
-                          <button
-                            onClick={(e) => handleCategoryClick(work.id, work.category_id, e)}
-                            className="category-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 transition-colors cursor-pointer"
-                            title="클릭하여 카테고리 변경"
-                          >
-                            {work.category_display_name}
-                          </button>
-                        </td>
-
-                        {/* Event Date */}
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {formatDate(work.event_date)}
-                        </td>
-
-                        {/* Status */}
-                        <td className="px-6 py-4 text-center">
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      썸네일
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      제목
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      카테고리
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      이벤트 날짜
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      조회수
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      상태
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      작업
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredWorks.map((work) => (
+                    <tr key={work.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+                          <Image
+                            src={work.thumbnail_image}
+                            alt={work.title}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                          />
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
+                          {work.title}
+                        </div>
+                        <div className="text-sm text-gray-500 max-w-xs truncate">
+                          {work.description}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <select
+                          value={work.category_id}
+                          onChange={(e) =>
+                            handleCategoryChange(work.id, parseInt(e.target.value))
+                          }
+                          className="text-sm border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                        >
+                          {categories.map((category) => (
+                            <option key={category.id} value={category.id}>
+                              {category.display_name}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center text-sm text-gray-900">
+                          <Calendar className="w-4 h-4 mr-2 text-gray-400" />
+                          {new Date(work.event_date).toLocaleDateString('ko-KR')}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center text-sm text-gray-900">
+                          <Eye className="w-4 h-4 mr-2 text-gray-400" />
+                          {work.view_count.toLocaleString()}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => handleToggleActive(work.id, work.is_active)}
+                          className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                            work.is_active
+                              ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                          }`}
+                        >
                           {work.is_active ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              활성
-                            </span>
+                            <>
+                              <Eye className="w-3 h-3" />
+                              <span>활성</span>
+                            </>
                           ) : (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                              비활성
-                            </span>
+                            <>
+                              <EyeOff className="w-3 h-3" />
+                              <span>비활성</span>
+                            </>
                           )}
-                        </td>
-
-                        {/* View Count */}
-                        <td className="px-6 py-4 text-center">
-                          <div className="flex items-center justify-center space-x-1 text-sm text-gray-600">
-                            <Eye className="w-4 h-4" />
-                            <span>{work.view_count.toLocaleString()}</span>
-                          </div>
-                        </td>
-
-                        {/* Actions */}
-                        <td className="px-6 py-4">
-                          <div className="flex items-center justify-center space-x-2">
-                            <Link
-                              href={`/admin/works/${work.id}/edit`}
-                              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-                              title="수정"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Link>
-                            <button
-                              onClick={() => handleDelete(work.id, work.title)}
-                              className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
-                              title="삭제"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                        </button>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex items-center justify-end space-x-2">
+                          <button
+                            onClick={() => router.push(`/admin/works/${work.id}/edit`)}
+                            className="text-gray-600 hover:text-gray-900 transition-colors"
+                            title="수정"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(work.id, work.title)}
+                            className="text-red-600 hover:text-red-900 transition-colors"
+                            title="삭제"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="mt-6 flex items-center justify-between">
-                <div className="text-sm text-gray-600">
-                  페이지 <span className="font-semibold">{currentPage}</span> / <span className="font-semibold">{totalPages}</span>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  {/* First Page */}
-                  <button
-                    onClick={() => setCurrentPage(1)}
-                    disabled={currentPage === 1}
-                    className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors"
-                    title="첫 페이지"
-                  >
-                    <ChevronsLeft className="w-4 h-4" />
-                  </button>
-
-                  {/* Previous Page */}
-                  <button
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors"
-                    title="이전 페이지"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-
-                  {/* Page Numbers */}
-                  <div className="hidden sm:flex items-center space-x-1">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNum;
-                      if (totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (currentPage <= 3) {
-                        pageNum = i + 1;
-                      } else if (currentPage >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
-                      } else {
-                        pageNum = currentPage - 2 + i;
-                      }
-
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setCurrentPage(pageNum)}
-                          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                            currentPage === pageNum
-                              ? 'bg-gray-900 text-white'
-                              : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
+              <div className="px-6 py-4 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-700">
+                    페이지 {currentPage} / {totalPages}
                   </div>
-
-                  {/* Next Page */}
-                  <button
-                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors"
-                    title="다음 페이지"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-
-                  {/* Last Page */}
-                  <button
-                    onClick={() => setCurrentPage(totalPages)}
-                    disabled={currentPage === totalPages}
-                    className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors"
-                    title="마지막 페이지"
-                  >
-                    <ChevronsRight className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
-          </>
+          </div>
         )}
       </main>
-
-      {editingWorkId !== null && popupPosition && (
-        <div
-          className="category-popup fixed z-50 bg-white border-1 border-gray-700 rounded-lg shadow-xl p-3 min-w-[200px]"
-          style={{
-            top: `${popupPosition.top}px`,
-            left: `${popupPosition.left}px`,
-          }}
-        >
-          <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-200">
-            <span className="text-xs font-semibold text-gray-700">카테고리 변경</span>
-            <button
-              onClick={handleCloseCategoryPopup}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="space-y-1 max-h-64 overflow-y-auto">
-            {categories.map((category) => {
-              const currentWork = works.find(w => w.id === editingWorkId);
-              return (
-                <button
-                  key={category.id}
-                  onClick={() => handleCategoryChange(editingWorkId, category.id)}
-                  className={`w-full text-left px-3 py-2 text-sm rounded transition-colors ${
-                    category.id === currentWork?.category_id
-                      ? 'bg-gray-900 text-white'
-                      : 'hover:bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  {category.display_name}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,30 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { query, queryOne } from '@/utils/db';
-import { verifyToken } from '@/lib/jwt';
+import { query } from '@/utils/db';
 import { WorkItemDB } from '@/types/works';
 
-export async function GET(
+export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 인증 확인
-    const token = request.cookies.get('admin_token')?.value;
-    if (!token) {
-      return NextResponse.json(
-        { success: false, error: '인증이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    const session = verifyToken(token);
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 토큰입니다.' },
-        { status: 401 }
-      );
-    }
-
     const { id } = await params;
     const workId = parseInt(id);
 
@@ -35,7 +17,70 @@ export async function GET(
       );
     }
 
-    const work = await queryOne<WorkItemDB>(
+    const body = await request.json();
+    const { title, description, categoryId, eventDate, isActive } = body;
+
+    // 부분 업데이트를 위한 동적 쿼리 생성
+    const updates: string[] = [];
+    const values: any[] = [];
+
+    if (title !== undefined) {
+      updates.push('title = ?');
+      values.push(title);
+    }
+
+    if (description !== undefined) {
+      updates.push('description = ?');
+      values.push(description);
+    }
+
+    if (categoryId !== undefined) {
+      // 카테고리 ID 유효성 검증
+      const categoryExists = await query(
+        'SELECT id FROM work_categories WHERE id = ?',
+        [categoryId]
+      );
+
+      if (categoryExists.length === 0) {
+        return NextResponse.json(
+          { success: false, error: '유효하지 않은 카테고리입니다.' },
+          { status: 400 }
+        );
+      }
+
+      updates.push('category_id = ?');
+      values.push(categoryId);
+    }
+
+    if (eventDate !== undefined) {
+      updates.push('event_date = ?');
+      values.push(eventDate);
+    }
+
+    if (isActive !== undefined) {
+      updates.push('is_active = ?');
+      values.push(isActive ? 1 : 0);
+    }
+
+    if (updates.length === 0) {
+      return NextResponse.json(
+        { success: false, error: '업데이트할 내용이 없습니다.' },
+        { status: 400 }
+      );
+    }
+
+    // updated_at 자동 추가
+    updates.push('updated_at = NOW()');
+    values.push(workId);
+
+    // 작업 업데이트
+    await query(
+      `UPDATE works SET ${updates.join(', ')} WHERE id = ?`,
+      values
+    );
+
+    // 업데이트된 작업 정보 조회
+    const updatedWork = await query<WorkItemDB>(
       `SELECT 
         w.id,
         w.title,
@@ -55,110 +100,22 @@ export async function GET(
       [workId]
     );
 
-    if (!work) {
+    if (updatedWork.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'Work not found' },
+        { success: false, error: '작업을 찾을 수 없습니다.' },
         { status: 404 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      data: work,
-    });
-  } catch (error) {
-    console.error('Error fetching work detail:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to load work detail' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    // 인증 확인
-    const token = request.cookies.get('admin_token')?.value;
-    if (!token) {
-      return NextResponse.json(
-        { success: false, error: '인증이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    const session = verifyToken(token);
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 토큰입니다.' },
-        { status: 401 }
-      );
-    }
-
-    const { id } = await params;
-    const workId = parseInt(id);
-
-    if (isNaN(workId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid work ID' },
-        { status: 400 }
-      );
-    }
-
-    const body = await request.json();
-    const { title, categoryId, description, eventDate, thumbnailImage, contentImages, isActive } = body;
-
-    // 유효성 검사
-    if (!title || !categoryId || !eventDate || !thumbnailImage || !contentImages || contentImages.length === 0) {
-      return NextResponse.json(
-        { success: false, error: '필수 항목을 모두 입력해주세요.' },
-        { status: 400 }
-      );
-    }
-
-    // 게시글 존재 확인
-    const existing = await queryOne('SELECT id FROM works WHERE id = ?', [workId]);
-    if (!existing) {
-      return NextResponse.json(
-        { success: false, error: 'Work not found' },
-        { status: 404 }
-      );
-    }
-
-    // 데이터 업데이트
-    await query(
-      `UPDATE works 
-       SET title = ?, 
-           category_id = ?, 
-           description = ?, 
-           event_date = ?, 
-           thumbnail_image = ?, 
-           content_images = ?, 
-           is_active = ?,
-           updated_at = NOW()
-       WHERE id = ?`,
-      [
-        title.trim(),
-        categoryId,
-        description?.trim() || '',
-        eventDate,
-        thumbnailImage,
-        JSON.stringify(contentImages),
-        isActive ? 1 : 0,
-        workId,
-      ]
-    );
-
-    return NextResponse.json({
-      success: true,
-      message: '게시글이 성공적으로 수정되었습니다.',
+      message: '작업이 성공적으로 수정되었습니다.',
+      work: updatedWork[0],
     });
   } catch (error) {
     console.error('Error updating work:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to update work' },
+      { success: false, error: '작업 수정 중 오류가 발생했습니다.' },
       { status: 500 }
     );
   }
@@ -169,23 +126,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 인증 확인
-    const token = request.cookies.get('admin_token')?.value;
-    if (!token) {
-      return NextResponse.json(
-        { success: false, error: '인증이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    const session = verifyToken(token);
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 토큰입니다.' },
-        { status: 401 }
-      );
-    }
-
     const { id } = await params;
     const workId = parseInt(id);
 
@@ -196,26 +136,20 @@ export async function DELETE(
       );
     }
 
-    // 게시글 존재 확인
-    const existing = await queryOne('SELECT id FROM works WHERE id = ?', [workId]);
-    if (!existing) {
-      return NextResponse.json(
-        { success: false, error: 'Work not found' },
-        { status: 404 }
-      );
-    }
-
-    // 소프트 삭제 (is_active = 0)
-    await query('UPDATE works SET is_active = 0, updated_at = NOW() WHERE id = ?', [workId]);
+    // 작업 삭제 (실제 삭제 대신 is_active를 0으로 설정)
+    await query(
+      'UPDATE works SET is_active = 0, updated_at = NOW() WHERE id = ?',
+      [workId]
+    );
 
     return NextResponse.json({
       success: true,
-      message: '게시글이 성공적으로 삭제되었습니다.',
+      message: '작업이 성공적으로 삭제되었습니다.',
     });
   } catch (error) {
     console.error('Error deleting work:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to delete work' },
+      { success: false, error: '작업 삭제 중 오류가 발생했습니다.' },
       { status: 500 }
     );
   }

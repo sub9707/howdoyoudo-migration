@@ -8,7 +8,7 @@ export interface WorkItemDB {
   event_date: string;
   thumbnail_image: string;
   content_images: string | string[];
-  is_active: boolean;
+  is_active: boolean | number;
   view_count: number;
   created_at: string;
   updated_at: string;

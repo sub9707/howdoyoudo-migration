@@ -1,37 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/utils/db';
-import { verifyToken } from '@/lib/jwt';
 import { WorkItemDB } from '@/types/works';
 
 export async function GET(request: NextRequest) {
   try {
-    // 인증 확인
-    const token = request.cookies.get('admin_token')?.value;
-    if (!token) {
-      return NextResponse.json(
-        { success: false, error: '인증이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    const session = verifyToken(token);
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 토큰입니다.' },
-        { status: 401 }
-      );
-    }
-
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
     const categoryId = searchParams.get("categoryId");
-    const search = searchParams.get("search");
+    const isActive = searchParams.get("isActive");
 
     const offset = (page - 1) * limit;
 
     // WHERE 조건 구성
-    let whereConditions = ['1=1'];
+    let whereConditions: string[] = [];
     const queryParams: any[] = [];
 
     if (categoryId && categoryId !== 'all') {
@@ -39,23 +21,25 @@ export async function GET(request: NextRequest) {
       queryParams.push(parseInt(categoryId));
     }
 
-    if (search) {
-      whereConditions.push('(w.title LIKE ? OR w.description LIKE ?)');
-      queryParams.push(`%${search}%`, `%${search}%`);
+    if (isActive !== null && isActive !== 'all') {
+      whereConditions.push('w.is_active = ?');
+      queryParams.push(isActive === 'true' ? 1 : 0);
     }
 
-    const whereClause = whereConditions.join(' AND ');
+    const whereClause = whereConditions.length > 0 
+      ? `WHERE ${whereConditions.join(' AND ')}`
+      : '';
 
     // 전체 개수 조회
     const countResult = await query<{ count: number }>(
       `SELECT COUNT(*) as count 
        FROM works w
-       WHERE ${whereClause}`,
+       ${whereClause}`,
       queryParams
     );
     const totalCount = countResult[0]?.count || 0;
 
-    // 데이터 조회
+    // 데이터 조회 (관리자용 - is_active 구분 없이 모두 조회)
     const works = await query<WorkItemDB>(
       `SELECT 
         w.id,
@@ -72,23 +56,33 @@ export async function GET(request: NextRequest) {
         w.updated_at
        FROM works w
        JOIN work_categories c ON w.category_id = c.id
-       WHERE ${whereClause}
+       ${whereClause}
        ORDER BY w.created_at DESC
        LIMIT ? OFFSET ?`,
       [...queryParams, limit, offset]
     );
 
+    // 카테고리 목록 조회
+    const categories = await query<{
+      id: number;
+      display_name: string;
+      is_active: boolean;
+    }>(
+      `SELECT id, display_name, is_active
+       FROM work_categories
+       ORDER BY id ASC`
+    );
+
     return NextResponse.json({
       success: true,
-      data: {
-        works,
-        totalCount,
-        currentPage: page,
-        totalPages: Math.ceil(totalCount / limit),
-      },
+      works,
+      totalCount,
+      categories,
+      hasMore: offset + limit < totalCount,
+      currentPage: page,
     });
   } catch (error) {
-    console.error("Error fetching works:", error);
+    console.error("Error reading admin works data:", error);
     return NextResponse.json(
       { success: false, error: "Failed to load works data" },
       { status: 500 }
@@ -98,59 +92,48 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // 인증 확인
-    const token = request.cookies.get('admin_token')?.value;
-    if (!token) {
-      return NextResponse.json(
-        { success: false, error: '인증이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    const session = verifyToken(token);
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 토큰입니다.' },
-        { status: 401 }
-      );
-    }
-
     const body = await request.json();
-    const { title, categoryId, description, eventDate, thumbnailImage, contentImages, isActive } = body;
+    const {
+      title,
+      description,
+      categoryId,
+      eventDate,
+      thumbnailImage,
+      contentImages = [],
+    } = body;
 
-    // 유효성 검사
-    if (!title || !categoryId || !eventDate || !thumbnailImage || !contentImages || contentImages.length === 0) {
+    // 입력값 검증
+    if (!title || !description || !categoryId || !eventDate || !thumbnailImage) {
       return NextResponse.json(
-        { success: false, error: '필수 항목을 모두 입력해주세요.' },
+        { success: false, error: '필수 필드를 모두 입력해주세요.' },
         { status: 400 }
       );
     }
 
-    // 데이터 삽입
+    // 작업 생성
     const result = await query(
       `INSERT INTO works 
-       (title, category_id, description, event_date, thumbnail_image, content_images, is_active) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+       (title, description, category_id, event_date, thumbnail_image, content_images, is_active, view_count)
+       VALUES (?, ?, ?, ?, ?, ?, 1, 0)`,
       [
-        title.trim(),
+        title,
+        description,
         categoryId,
-        description?.trim() || '',
         eventDate,
         thumbnailImage,
         JSON.stringify(contentImages),
-        isActive ? 1 : 0,
       ]
     );
 
     return NextResponse.json({
       success: true,
-      message: '게시글이 성공적으로 생성되었습니다.',
-      data: { id: (result as any).insertId },
+      message: '작업이 성공적으로 생성되었습니다.',
+      workId: (result as any).insertId,
     });
   } catch (error) {
-    console.error("Error creating work:", error);
+    console.error('Error creating work:', error);
     return NextResponse.json(
-      { success: false, error: "Failed to create work" },
+      { success: false, error: '작업 생성 중 오류가 발생했습니다.' },
       { status: 500 }
     );
   }
