@@ -176,7 +176,7 @@ export default function WorkDetailClient({ initialData }: WorkDetailClientProps)
               <Link
                 href={`/works/${navigation.prev.id}`}
                 data-no-transition="true"
-                className="group p-6 border-2 border-gray-200 rounded-xl hover:border-gray-900 transition-all duration-300"
+                className="group p-6 transition-all duration-300"
               >
                 <div className="flex items-center space-x-3 mb-2">
                   <ChevronLeft className="w-4 h-4 text-gray-400 group-hover:text-gray-900 transition-colors" />
@@ -195,7 +195,7 @@ export default function WorkDetailClient({ initialData }: WorkDetailClientProps)
               <Link
                 href={`/works/${navigation.next.id}`}
                 data-no-transition="true"
-                className="group p-6 border-2 border-gray-200 rounded-xl hover:border-gray-900 transition-all duration-300"
+                className="group p-6 transition-all duration-300"
               >
                 <div className="flex items-center justify-end space-x-3 mb-2">
                   <span className="text-sm font-medium text-gray-500 group-hover:text-gray-900 transition-colors">
@@ -216,7 +216,7 @@ export default function WorkDetailClient({ initialData }: WorkDetailClientProps)
           <Link
             href="/works"
             data-no-transition="true"
-            className="inline-flex items-center px-8 py-4 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-colors shadow-lg hover:shadow-xl"
+            className="inline-flex items-center"
           >
             <span className="font-medium">목록으로</span>
           </Link>

@@ -48,16 +48,13 @@ export default function Page() {
                         <div className="w-full text-center border-t border-gray-600 pt-8">
                             <h3 className="text-sm font-semibold mb-8 tracking-wider">CONTACT US</h3>
                             <div className="flex justify-center space-x-4">
-                                <a href="#" className="w-8 h-8 bg-transparent border border-gray-500 rounded flex items-center justify-center hover:bg-white hover:text-gray-800 transition-colors">
-                                    <Facebook className="w-4 h-4" />
-                                </a>
-                                <a href="#" className="w-8 h-8 bg-transparent border border-gray-500 rounded flex items-center justify-center hover:bg-white hover:text-gray-800 transition-colors">
+                                <a href="https://www.youtube.com/@howdoyoudo2025" className="w-8 h-8 bg-transparent border border-gray-500 rounded flex items-center justify-center hover:bg-white hover:text-gray-800 transition-colors">
                                     <Youtube className="w-4 h-4" />
                                 </a>
                                 <a href="#" className="w-8 h-8 bg-transparent border border-gray-500 rounded flex items-center justify-center hover:bg-white hover:text-gray-800 transition-colors">
                                     <Instagram className="w-4 h-4" />
                                 </a>
-                            </div>
+                            </div>z
                         </div>
                     </div>
 
