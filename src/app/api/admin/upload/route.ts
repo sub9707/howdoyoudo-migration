@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/jwt';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,10 +21,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 파일 크기 제한 (10MB)
-    if (file.size > 10 * 1024 * 1024) {
+    // 파일 크기 제한 (50MB)
+    if (file.size > 50 * 1024 * 1024) {
       return NextResponse.json(
-        { success: false, error: '파일 크기는 10MB를 초과할 수 없습니다.' },
+        { success: false, error: '파일 크기는 50MB를 초과할 수 없습니다.' },
         { status: 400 }
       );
     }
@@ -46,28 +44,42 @@ export async function POST(request: NextRequest) {
     const ext = file.name.split('.').pop();
     const filename = `${timestamp}-${randomString}.${ext}`;
 
-    // 업로드 디렉토리 생성
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'works');
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (error) {
-      // 디렉토리가 이미 존재하면 무시
+    // 외부 서버 업로드 URL
+    const uploadServerUrl = process.env.UPLOAD_SERVER_URL || 'http://subdevpi.duckdns.org:3000';
+    const uploadPath = 'howdoyoudo/works'; // 업로드할 경로
+    
+    // FormData 생성 (외부 서버로 전송)
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
+    uploadFormData.append('filename', filename);
+
+    // 외부 서버로 업로드
+    const uploadResponse = await fetch(`${uploadServerUrl}/upload/${uploadPath}`, {
+      method: 'POST',
+      body: uploadFormData,
+    });
+
+    if (!uploadResponse.ok) {
+      const errorText = await uploadResponse.text();
+      console.error('외부 서버 업로드 실패:', errorText);
+      return NextResponse.json(
+        { success: false, error: '외부 서버로의 업로드에 실패했습니다.' },
+        { status: 500 }
+      );
     }
 
-    // 파일 저장
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const filepath = path.join(uploadDir, filename);
-    await writeFile(filepath, buffer);
-
-    // 반환할 URL 생성
-    const fileUrl = `/uploads/works/${filename}`;
+    const uploadResult = await uploadResponse.json();
+    
+    // 업로드 성공 시 파일 URL 생성
+    // 외부 서버의 응답 형식: { success: true, message: '...', file: { ... } }
+    const fileUrl = `${uploadServerUrl}/file/${uploadPath}/${filename}`;
 
     return NextResponse.json({
       success: true,
       data: {
         url: fileUrl,
         filename: filename,
+        uploadResult: uploadResult, // 디버깅용
       },
     });
   } catch (error) {

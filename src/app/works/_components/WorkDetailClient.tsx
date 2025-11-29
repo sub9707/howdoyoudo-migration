@@ -135,19 +135,6 @@ export default function WorkDetailClient({ initialData }: WorkDetailClientProps)
           </div>
         </div>
 
-        {/* Thumbnail Image */}
-        <div className="mb-12 md:mb-16">
-          <div className="relative aspect-video md:aspect-[16/10] rounded-2xl overflow-hidden bg-gray-100 shadow-xl">
-            <Image
-              src={work.thumbnailImage}
-              alt={work.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 1024px"
-              priority
-            />
-          </div>
-        </div>
 
         {/* Description */}
         <div className="mb-12 md:mb-16">

@@ -11,7 +11,6 @@ import {
   Calendar,
   Tag,
   Search,
-  Filter,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -114,34 +113,8 @@ export default function AdminWorksPage() {
     }
   };
 
-  const handleCategoryChange = async (workId: number, newCategoryId: number) => {
-    try {
-      const response = await fetch(`/api/admin/works/${workId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          categoryId: newCategoryId,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        // 작업 목록 새로고침
-        fetchWorks();
-      } else {
-        alert(data.error || '카테고리 변경에 실패했습니다.');
-      }
-    } catch (error) {
-      console.error('Error changing category:', error);
-      alert('카테고리 변경 중 오류가 발생했습니다.');
-    }
-  };
-
   const handleDelete = async (workId: number, title: string) => {
-    if (!confirm(`"${title}"를 삭제하시겠습니까?`)) {
+    if (!confirm(`"${title}"를 완전히 삭제하시겠습니까?\n\n⚠️ 이 작업은 되돌릴 수 없으며, DB에서 영구적으로 제거됩니다.`)) {
       return;
     }
 
@@ -154,6 +127,7 @@ export default function AdminWorksPage() {
 
       if (data.success) {
         alert('작업이 성공적으로 삭제되었습니다.');
+        // 즉시 목록 새로고침
         fetchWorks();
       } else {
         alert(data.error || '삭제에 실패했습니다.');
@@ -245,8 +219,8 @@ export default function AdminWorksPage() {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
             >
               <option value="all">모든 상태</option>
-              <option value="true">활성화</option>
-              <option value="false">비활성화</option>
+              <option value="true">활성화만 보기</option>
+              <option value="false">비활성화만 보기</option>
             </select>
           </div>
         </div>
@@ -258,14 +232,24 @@ export default function AdminWorksPage() {
             <p className="text-gray-600">로딩 중...</p>
           </div>
         ) : filteredWorks.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">작업이 없습니다.</p>
+          <div className="bg-white rounded-xl p-12 text-center shadow-sm">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              작업이 없습니다
+            </h3>
+            <p className="text-gray-600">
+              {searchTerm
+                ? '검색 결과가 없습니다.'
+                : '새로운 작업을 추가해보세요.'}
+            </p>
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       썸네일
@@ -277,7 +261,7 @@ export default function AdminWorksPage() {
                       카테고리
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      이벤트 날짜
+                      행사 일자
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       조회수
@@ -292,9 +276,9 @@ export default function AdminWorksPage() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredWorks.map((work) => (
-                    <tr key={work.id} className="hover:bg-gray-50">
+                    <tr key={work.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+                        <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
                           <Image
                             src={work.thumbnail_image}
                             alt={work.title}
@@ -305,44 +289,29 @@ export default function AdminWorksPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
+                        <div className="text-sm font-medium text-gray-900 line-clamp-2">
                           {work.title}
                         </div>
-                        <div className="text-sm text-gray-500 max-w-xs truncate">
-                          {work.description}
-                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <select
-                          value={work.category_id}
-                          onChange={(e) =>
-                            handleCategoryChange(work.id, parseInt(e.target.value))
-                          }
-                          className="text-sm border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        >
-                          {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                              {category.display_name}
-                            </option>
-                          ))}
-                        </select>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          <Tag className="w-3 h-3 mr-1" />
+                          {work.category_display_name}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center text-sm text-gray-900">
-                          <Calendar className="w-4 h-4 mr-2 text-gray-400" />
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Calendar className="w-4 h-4 mr-1" />
                           {new Date(work.event_date).toLocaleDateString('ko-KR')}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center text-sm text-gray-900">
-                          <Eye className="w-4 h-4 mr-2 text-gray-400" />
-                          {work.view_count.toLocaleString()}
-                        </div>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {work.view_count.toLocaleString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <button
                           onClick={() => handleToggleActive(work.id, work.is_active)}
-                          className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                          className={`inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
                             work.is_active
                               ? 'bg-green-100 text-green-800 hover:bg-green-200'
                               : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
@@ -350,12 +319,12 @@ export default function AdminWorksPage() {
                         >
                           {work.is_active ? (
                             <>
-                              <Eye className="w-3 h-3" />
+                              <Eye className="w-3 h-3 mr-1" />
                               <span>활성</span>
                             </>
                           ) : (
                             <>
-                              <EyeOff className="w-3 h-3" />
+                              <EyeOff className="w-3 h-3 mr-1" />
                               <span>비활성</span>
                             </>
                           )}
@@ -373,7 +342,7 @@ export default function AdminWorksPage() {
                           <button
                             onClick={() => handleDelete(work.id, work.title)}
                             className="text-red-600 hover:text-red-900 transition-colors"
-                            title="삭제"
+                            title="완전 삭제"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

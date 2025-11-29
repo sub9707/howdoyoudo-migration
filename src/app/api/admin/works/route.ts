@@ -21,10 +21,13 @@ export async function GET(request: NextRequest) {
       queryParams.push(parseInt(categoryId));
     }
 
-    if (isActive !== null && isActive !== 'all') {
-      whereConditions.push('w.is_active = ?');
-      queryParams.push(isActive === 'true' ? 1 : 0);
+    // isActive 필터 처리 수정
+    if (isActive === 'true') {
+      whereConditions.push('w.is_active = 1');
+    } else if (isActive === 'false') {
+      whereConditions.push('w.is_active = 0');
     }
+    // 'all'이면 조건 추가하지 않음
 
     const whereClause = whereConditions.length > 0 
       ? `WHERE ${whereConditions.join(' AND ')}`
@@ -39,7 +42,7 @@ export async function GET(request: NextRequest) {
     );
     const totalCount = countResult[0]?.count || 0;
 
-    // 데이터 조회 (관리자용 - is_active 구분 없이 모두 조회)
+    // 데이터 조회 (관리자용 - 필터에 따라 조회)
     const works = await query<WorkItemDB>(
       `SELECT 
         w.id,
