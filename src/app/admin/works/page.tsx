@@ -146,34 +146,6 @@ export default function AdminWorksPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Works 관리</h1>
-              <p className="text-sm text-gray-600 mt-1">
-                총 {totalCount}개의 작업
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => router.push('/admin/dashboard')}
-                className="px-4 py-2 text-gray-700 hover:text-gray-900 transition-colors"
-              >
-                대시보드로
-              </button>
-              <button
-                onClick={() => router.push('/admin/works/new')}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                <span>새 작업 추가</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
