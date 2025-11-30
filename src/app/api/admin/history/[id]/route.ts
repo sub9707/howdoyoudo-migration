@@ -4,10 +4,11 @@ import { query } from '@/utils/db';
 // PUT - history 수정
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
+
     const body = await request.json();
     const { year, date, description } = body;
 
@@ -30,13 +31,14 @@ export async function PUT(
   }
 }
 
+
 // DELETE - history 삭제
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
 
     const result = await query('DELETE FROM history WHERE id = ?', [id]);
 

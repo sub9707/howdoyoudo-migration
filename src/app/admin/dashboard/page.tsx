@@ -132,22 +132,19 @@ export default function AdminDashboardPage() {
     {
       title: 'Works 관리',
       description: '포트폴리오 작업물 관리',
-      icon: FileText,
       href: '/admin/works',
       stats: worksStats ? `${worksStats.activeWorks}개 활성` : '로딩 중...',
     },
     {
-      title: '통계',
+      title: '통계(준비중)',
       description: '방문자 및 활동 분석',
-      icon: BarChart3,
-      href: '/admin/analytics',
+      href: '/admin',
       stats: worksStats ? `${worksStats.totalViews.toLocaleString()} 조회` : '로딩 중...',
     },
     {
-      title: '설정',
-      description: '시스템 환경 설정',
-      icon: Settings,
-      href: '/admin/settings',
+      title: '연혁 관리',
+      description: '연혁 항목 추가 및 수정',
+      href: '/admin/history',
       stats: '관리자 설정',
     },
   ];
