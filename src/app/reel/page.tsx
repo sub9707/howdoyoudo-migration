@@ -31,12 +31,10 @@ export default function ReelPage() {
       }
 
       const url = `/api/youtube?type=${activeTab}${pageToken ? `&pageToken=${pageToken}` : ''}`;
-      console.log('Fetching:', url);
 
       const response = await fetch(url);
       const data = await response.json();
 
-      console.log('API Response:', data);
 
       if (data.error) {
         console.error('API Error:', data.error, data.details);

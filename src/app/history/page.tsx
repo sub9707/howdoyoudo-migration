@@ -42,7 +42,6 @@ async function getHistoryData(): Promise<HistoryData> {
 
 export default async function HistoryPage() {
   const { companyHistory } = await getHistoryData();
-  console.log(companyHistory)
 
   return (
     <div className="min-h-screen bg-white">

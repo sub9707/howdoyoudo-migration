@@ -22,10 +22,9 @@ const ProcessCube: React.FC<ProcessCubeProps> = ({ text }) => {
   const floatOffsetRef = useRef(Math.random() * Math.PI * 2);
   const floatSpeedRef = useRef(0.5 + Math.random() * 0.3);
 
-  const cubeSize = 45; // ✅ 큐브 크기 증가 (30 → 45)
-  const textScale = 1.5; // ✅ 텍스트 크기 증가
+  const cubeSize = 45;
+  const textScale = 1.5;
 
-  // 👇 카메라 거리 자동 계산
   const computeCameraDistanceToFit = (
     size: number,
     fovDeg: number,
@@ -43,14 +42,14 @@ const ProcessCube: React.FC<ProcessCubeProps> = ({ text }) => {
     if (!containerRef.current) return;
 
     const container = containerRef.current;
+    const containerSize = container.offsetWidth; // 부모 크기 가져오기
 
     // === Scene ===
     const scene = new THREE.Scene();
-    // 배경색 제거 - 투명하게 만들기
     sceneRef.current = scene;
 
     // === Camera ===
-    const aspect = 1; // 정사각형 기준
+    const aspect = 1;
     const camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 1000);
     const fittedDistance = computeCameraDistanceToFit(cubeSize, camera.fov, aspect);
     camera.position.z = fittedDistance * 1.05;
@@ -59,9 +58,8 @@ const ProcessCube: React.FC<ProcessCubeProps> = ({ text }) => {
 
     // === Renderer ===
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(250, 250, false); // ✅ 렌더러 크기 증가 (200 → 250)
+    renderer.setSize(containerSize, containerSize, false); // 컨테이너 크기에 맞춤
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -73,31 +71,24 @@ const ProcessCube: React.FC<ProcessCubeProps> = ({ text }) => {
       const ctx = canvas.getContext('2d');
       if (!ctx) return null;
 
-      // 모든 면을 투명하게
       const gradient = ctx.createLinearGradient(0, 0, 512, 512);
       gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
       gradient.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, 512, 512);
 
-      // 텍스트 면에는 안쪽 보더 없음
       if (!isMain) {
-        ctx.strokeStyle = 'rgba(255,255,255,0.4)'; // ✅ 보더 투명도 조정
+        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
         ctx.lineWidth = 4;
         ctx.strokeRect(30, 30, 452, 452);
       }
 
       if (textContent) {
-        // ✅ 글로우 제거, 순수 흰색 텍스트만
         ctx.font = `900 ${100 * scale}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-
-        // 그림자 완전 제거
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
-
-        // 순수 흰색으로 10번 그려서 매우 진하고 선명하게
         ctx.fillStyle = '#ffffff';
         for (let i = 0; i < 10; i++) {
           ctx.fillText(textContent, 256, 256);
@@ -117,8 +108,8 @@ const ProcessCube: React.FC<ProcessCubeProps> = ({ text }) => {
         map: createTexture(text, true, textScale),
         transparent: true,
         opacity: 0.8,
-        emissive: 0xffffff, // ✅ 자체 발광으로 텍스트만 밝게
-        emissiveIntensity: 0.5 // ✅ 발광 강도 증가
+        emissive: 0xffffff,
+        emissiveIntensity: 0.5
       }),
       new THREE.MeshStandardMaterial({ map: createTexture('', false, textScale), transparent: true, opacity: 0.8 }),
     ];
@@ -132,14 +123,14 @@ const ProcessCube: React.FC<ProcessCubeProps> = ({ text }) => {
       color: 0xffffff,
       linewidth: 4,
       transparent: true,
-      opacity: 0.8, // ✅ 투명도 조정
+      opacity: 0.8,
     });
     cube.add(new THREE.LineSegments(edges, lineMaterial));
 
     scene.add(cube);
 
     // === Lighting ===
-    const ambient = new THREE.AmbientLight(0xffffff, 1.0); // ✅ 적절한 밝기
+    const ambient = new THREE.AmbientLight(0xffffff, 1.0);
     const point1 = new THREE.PointLight(0xffffff, 1.5);
     point1.position.set(10, 10, 10);
     const point2 = new THREE.PointLight(0xffffff, 1.2);
@@ -212,7 +203,7 @@ const ProcessCube: React.FC<ProcessCubeProps> = ({ text }) => {
   return (
     <div
       ref={containerRef}
-      className="w-[250px] h-[250px] cursor-grab active:cursor-grabbing"
+      className="w-full h-full cursor-grab active:cursor-grabbing"
     />
   );
 };

@@ -8,16 +8,19 @@ export default function AboutSection() {
   const getCurrentYear = () => {
     return new Date().getFullYear() - 2005;
   }
+
   return (
-    <section className="pb-40">
-      <div className="max-w-7xl mx-auto px-6 space-y-32">
+    <section className="pb-20 sm:pb-32 lg:pb-40">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-16 sm:space-y-24 lg:space-y-32">
 
         <AboutCard
           title="No.1"
           subtitle="하우두유두"
           headline={
             <>
-              <div className="text-5xl font-black text-black mb-6">{getCurrentYear()}년 경험과 노하우</div>
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-black mb-4 sm:mb-6">
+                {getCurrentYear()}년 경험과 노하우
+              </div>
               <span>기업의 성장과 가치를 위한 완벽한 파트너</span>
             </>
           }
@@ -37,7 +40,9 @@ export default function AboutSection() {
           subtitle="하우두유두"
           headline={
             <>
-              <div className="text-5xl font-black text-black mb-6">하우두유두를 움직이는 힘,</div>
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-black mb-4 sm:mb-6">
+                하우두유두를 움직이는 힘,
+              </div>
               그것은 바로 프로 집단의 <span className="font-extrabold text-black">Best 정신</span>입니다.
             </>
           }

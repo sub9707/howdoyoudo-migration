@@ -67,8 +67,6 @@ const PostManagement: React.FC<PostManagementProps> = ({ currentUser }) => {
   }, [pagination.currentPage, pagination.limit, filters]);
 
   const handleEdit = async (postId: number): Promise<void> => {
-    // 실제 환경에서는 수정 모달이나 페이지로 이동
-    console.log(`게시글 ${postId} 수정`);
 
     // 예시: 제목 수정
     const newTitle = prompt('새 제목을 입력하세요:');

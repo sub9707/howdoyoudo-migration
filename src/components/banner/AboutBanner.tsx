@@ -7,22 +7,23 @@ import ProcessCube from './ProcessCube';
 interface AboutBannerProps {
   height?: string;
   className?: string;
+  mobileHeight?: string;
 }
 
-const AboutBanner: React.FC<AboutBannerProps> = ({ 
+const AboutBanner: React.FC<AboutBannerProps> = ({
   height = "100vh",
+  mobileHeight = "auto",
   className = ""
 }) => {
   return (
-    <div 
+    <div
       className={`relative w-full overflow-hidden bg-gradient-to-r from-[#05060c] via-[#0a142e] to-[#05060e] ${className}`}
-      style={{ height }}
     >
       {/* Background Particles */}
       <ParticleBackground />
 
       {/* ✅ 비네팅 효과 - 검은색 그라데이션 */}
-      <div 
+      <div
         className="absolute inset-0 z-[1] pointer-events-none"
         style={{
           background: 'radial-gradient(ellipse at center, transparent 0%, transparent 40%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.8) 100%)'
@@ -55,33 +56,33 @@ const AboutBanner: React.FC<AboutBannerProps> = ({
       </div>
 
       {/* Main Content */}
-      <div className="relative z-[2] w-full h-full flex flex-col justify-center items-center text-white text-center px-4 md:px-5 py-12 md:py-20">
+      <div className="relative z-[2] w-full md:h-screen flex flex-col justify-center items-center text-white text-center px-4 md:px-5 py-12 md:py-20">
         {/* Title */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-wider mb-6 md:mb-10 opacity-0 -translate-y-[30px] animate-[fadeInDown_1s_ease_0.3s_forwards] [text-shadow:0_0_30px_rgba(100,200,255,0.5)] leading-tight">
+        <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-wider mb-3 md:mb-6 opacity-0 -translate-y-[30px] animate-[fadeInDown_1s_ease_0.3s_forwards] [text-shadow:0_0_30px_rgba(100,200,255,0.5)] leading-tight">
           HOWDOYOUDO CO.,LTD
         </h1>
 
         {/* Subtitle */}
-        <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-2 md:mb-4 opacity-0 -translate-y-[20px] animate-[fadeInDown_1s_ease_0.6s_forwards] text-white/90 px-4">
+        <p className="text-xs sm:text-sm md:text-lg lg:text-xl mb-1 md:mb-2 opacity-0 -translate-y-[20px] animate-[fadeInDown_1s_ease_0.6s_forwards] text-white/90 px-4">
           주식회사 하우두유두는 고객이 목표하는 마케팅 성과를 위해
         </p>
 
         {/* Description */}
-        <p className="text-sm sm:text-base md:text-lg lg:text-xl  opacity-0 -translate-y-[20px] animate-[fadeInDown_1s_ease_0.9s_forwards] text-white/90 px-4">
+        <p className="text-xs sm:text-sm md:text-lg lg:text-xl mb-6 md:mb-12 opacity-0 -translate-y-[20px] animate-[fadeInDown_1s_ease_0.9s_forwards] text-white/90 px-4">
           BTL영역의 통합적인 Marketing 전략으로 One-Stop Service를 제공합니다.
         </p>
 
-        {/* Process Boxes - 크기 증가 */}
-        <div className="flex flex-row gap-8 sm:gap-10 md:gap-12 lg:gap-16 items-center justify-center w-full max-w-[1200px] px-4">
-          <div className="flex-shrink-0 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] md:w-[200px] md:h-[200px] lg:w-[220px] lg:h-[220px] xl:w-[250px] xl:h-[250px] opacity-0 scale-75 animate-[fadeInScale_0.8s_ease_1.2s_forwards]">
+        {/* Process Boxes - 모바일에서도 가로 배치 */}
+        <div className="flex flex-row gap-3 sm:gap-4 md:gap-12 lg:gap-16 items-center justify-center w-full max-w-[1200px] px-4">
+          <div className="flex-shrink-0 w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[200px] md:h-[200px] lg:w-[220px] lg:h-[220px] xl:w-[250px] xl:h-[250px] opacity-0 scale-75 animate-[fadeInScale_0.8s_ease_1.2s_forwards]">
             <ProcessCube text="기획" />
           </div>
 
-          <div className="flex-shrink-0 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] md:w-[200px] md:h-[200px] lg:w-[220px] lg:h-[220px] xl:w-[250px] xl:h-[250px] opacity-0 scale-75 animate-[fadeInScale_0.8s_ease_1.6s_forwards]">
+          <div className="flex-shrink-0 w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[200px] md:h-[200px] lg:w-[220px] lg:h-[220px] xl:w-[250px] xl:h-[250px] opacity-0 scale-75 animate-[fadeInScale_0.8s_ease_1.6s_forwards]">
             <ProcessCube text="준비" />
           </div>
 
-          <div className="flex-shrink-0 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] md:w-[200px] md:h-[200px] lg:w-[220px] lg:h-[220px] xl:w-[250px] xl:h-[250px] opacity-0 scale-75 animate-[fadeInScale_0.8s_ease_2s_forwards]">
+          <div className="flex-shrink-0 w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[200px] md:h-[200px] lg:w-[220px] lg:h-[220px] xl:w-[250px] xl:h-[250px] opacity-0 scale-75 animate-[fadeInScale_0.8s_ease_2s_forwards]">
             <ProcessCube text="운영" />
           </div>
         </div>

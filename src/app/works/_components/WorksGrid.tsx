@@ -13,13 +13,14 @@ interface WorksGridProps {
 function WorkCard({ work }: { work: WorkItem }) {
     return (
         <Link href={`/works/${work.id}`} data-no-transition="true" className="group block">
+            {/* 이미지 컨테이너 */}
             <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-gray-100 shadow-sm hover:shadow-lg transition-all duration-300">
                 {/* 썸네일 이미지 */}
                 <Image
                     src={work.thumbnailImage}
                     alt={work.title}
                     fill
-                    className="object-cover transition-all duration-500 group-hover:scale-110 group-hover:blur-sm"
+                    className="object-cover transition-all duration-500 md:group-hover:scale-110 md:group-hover:blur-sm"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
 
@@ -30,21 +31,33 @@ function WorkCard({ work }: { work: WorkItem }) {
                     </span>
                 </div>
 
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/40 transition-all duration-500 flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-500 text-center px-4">
-                        <h3
-                            className="text-lg md:text-xl font-bold text-black mb-2 line-clamp-3 break-keep"
-                            style={{ textShadow: "0 1px 3px rgba(0,0,0,0.25)" }}
-                        >
-                            {work.title}
-                        </h3>
+                {/* Hover Overlay - 데스크톱만 */}
+                <div className="hidden md:block absolute inset-0 bg-white/0 group-hover:bg-white/40 transition-all duration-500">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-500 h-full flex items-center justify-center px-4">
+                        <div className="text-center">
+                            <h3
+                                className="text-lg md:text-xl font-bold text-black mb-2 line-clamp-3 break-keep"
+                                style={{ textShadow: "0 1px 3px rgba(0,0,0,0.25)" }}
+                            >
+                                {work.title}
+                            </h3>
 
-                        <p className="text-sm text-gray-700 font-medium">
-                            {`${work.eventDate.slice(0, 4)}.${work.eventDate.slice(5, 7)}.${work.eventDate.slice(8, 10)}`}
-                        </p>
+                            <p className="text-sm text-gray-700 font-medium">
+                                {`${work.eventDate.slice(0, 4)}.${work.eventDate.slice(5, 7)}.${work.eventDate.slice(8, 10)}`}
+                            </p>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            {/* 모바일 전용 제목/날짜 - 카드 아래 */}
+            <div className="md:hidden mt-3 space-y-1">
+                <h3 className="text-sm font-bold text-gray-900 line-clamp-2 break-keep leading-tight">
+                    {work.title}
+                </h3>
+                <p className="text-xs text-gray-500 font-medium">
+                    {`${work.eventDate.slice(0, 4)}.${work.eventDate.slice(5, 7)}.${work.eventDate.slice(8, 10)}`}
+                </p>
             </div>
         </Link>
     );
@@ -52,11 +65,12 @@ function WorkCard({ work }: { work: WorkItem }) {
 
 function LoadingSkeleton() {
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="space-y-4">
+                <div key={index} className="space-y-3">
                     <div className="aspect-[4/5] bg-gray-200 rounded-lg animate-pulse" />
-                    <div className="space-y-2">
+                    {/* 모바일 스켈레톤 */}
+                    <div className="md:hidden space-y-2">
                         <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse" />
                         <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse" />
                     </div>
