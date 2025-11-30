@@ -2,10 +2,24 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import tempData from '../tempData.json'
 
-export default function YearBar() {
-    const years: string[] = tempData.companyHistory.map((item) => item.year)
+interface HistoryEvent {
+  date: string;
+  description: string;
+}
+
+interface YearData {
+  year: string;
+  events: HistoryEvent[];
+}
+
+interface YearBarProps {
+  companyHistory: YearData[];
+}
+
+export default function YearBar({ companyHistory }: YearBarProps) {
+    // companyHistory가 없으면 빈 배열 사용
+    const years: string[] = companyHistory?.map((item) => item.year) || []
     const [activeYear, setActiveYear] = useState<string | null>(null)
 
     // 현재 보이는 연도 감지
@@ -46,6 +60,8 @@ export default function YearBar() {
         const opacity = Math.max(0.4, 1 - distance * 0.2) // 멀어질수록 흐리게
         return { scale, opacity }
     }
+
+    if (years.length === 0) return null;
 
     return (
         <div

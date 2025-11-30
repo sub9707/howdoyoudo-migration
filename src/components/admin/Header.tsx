@@ -65,6 +65,7 @@ function Header() {
         if (pathname === '/admin/dashboard') return '관리자 대시보드';
         if (pathname.startsWith('/admin/works')) return 'Works 관리';
         if (pathname.startsWith('/admin/analytics')) return '통계';
+        if (pathname.startsWith('/admin/history')) return '연혁 관리';
         return '관리자';
     };
 
@@ -72,6 +73,7 @@ function Header() {
         if (pathname === '/admin/dashboard') return 'HOWDOYOUDO Admin Portal';
         if (pathname.startsWith('/admin/works')) return 'Works Management';
         if (pathname.startsWith('/admin/analytics')) return 'HOWDOYOUDO Analytics';
+        if (pathname.startsWith('/admin/history')) return 'History Management';
         return 'Admin';
     };
 
@@ -112,7 +114,7 @@ function Header() {
                                     : 'text-gray-600 hover:bg-gray-100'
                                     }`}
                             >
-                                Works
+                                Works 관리
                             </Link>
                             <Link
                                 href="/admin/analytics"
@@ -122,6 +124,15 @@ function Header() {
                                     }`}
                             >
                                 통계
+                            </Link>
+                            <Link
+                                href="/admin/history"
+                                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${pathname.startsWith('/admin/history')
+                                    ? 'bg-gray-900 text-white'
+                                    : 'text-gray-600 hover:bg-gray-100'
+                                    }`}
+                            >
+                                연혁 관리
                             </Link>
                         </nav>
 
