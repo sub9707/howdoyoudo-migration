@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { LogOut, Shield, BarChart3 } from 'lucide-react';
+import { LogOut, Shield } from 'lucide-react';
 import Link from 'next/link';
 
 interface AdminInfo {
@@ -118,7 +118,7 @@ function Header() {
                                     : 'text-gray-600 hover:bg-gray-100'
                                     }`}
                             >
-                                <BarChart3 className="w-4 h-4" />
+                                통계
                             </Link>
                         </nav>
 
