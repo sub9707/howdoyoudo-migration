@@ -33,10 +33,12 @@ function Header() {
 
     const fetchAdminInfo = async () => {
         try {
-            const response = await fetch('/api/admin/me');
+            const response = await fetch('/api/admin/auth/session');
             if (response.ok) {
                 const data = await response.json();
-                setAdminInfo(data);
+                if (data.success && data.admin) {
+                    setAdminInfo(data.admin);
+                }
             }
         } catch (error) {
             console.error('Failed to fetch admin info:', error);
@@ -45,8 +47,9 @@ function Header() {
 
     const handleLogout = async () => {
         try {
-            await fetch('/api/admin/logout', { method: 'POST' });
+            await fetch('/api/admin/auth/logout', { method: 'POST' });
             router.push('/admin/login');
+            router.refresh();
         } catch (error) {
             console.error('Logout failed:', error);
         }
@@ -73,7 +76,7 @@ function Header() {
     };
 
     return (
-        <header className = "bg-white border-b border-gray-200 sticky top-0 z-30" >
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Left: Page Title */}
@@ -138,8 +141,8 @@ function Header() {
                     </div>
                 </div>
             </div>
-      </header>
-  )
+        </header>
+    )
 }
 
 export default Header

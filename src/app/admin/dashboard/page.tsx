@@ -10,7 +10,13 @@ import {
   Plus,
   Eye,
   Calendar,
+  BarChart3,
+  Settings,
+  Users,
+  TrendingUp,
+  ArrowRight,
 } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface AdminInfo {
   id: number;
@@ -35,13 +41,22 @@ interface WorksStats {
   }[];
 }
 
+interface DailyVisit {
+  date: string;
+  visitors: number;
+}
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [adminInfo, setAdminInfo] = useState<AdminInfo | null>(null);
+  const [worksStats, setWorksStats] = useState<WorksStats | null>(null);
+  const [dailyVisits, setDailyVisits] = useState<DailyVisit[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchAdminInfo();
+    fetchWorksStats();
+    generateDailyVisits();
   }, []);
 
   const fetchAdminInfo = async () => {
@@ -62,16 +77,35 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleLogout = async () => {
+  const fetchWorksStats = async () => {
     try {
-      await fetch('/api/admin/auth/logout', {
-        method: 'POST',
-      });
-      router.push('/admin/login');
-      router.refresh();
+      const response = await fetch('/api/admin/works/stats');
+      const data = await response.json();
+
+      if (data.success) {
+        setWorksStats(data.stats);
+      }
     } catch (error) {
-      console.error('로그아웃 오류:', error);
+      console.error('통계 정보 로드 오류:', error);
     }
+  };
+
+  // 더미 데이터 생성 (실제로는 API에서 가져와야 함)
+  const generateDailyVisits = () => {
+    const data: DailyVisit[] = [];
+    const today = new Date();
+    
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      
+      data.push({
+        date: `${date.getMonth() + 1}/${date.getDate()}`,
+        visitors: Math.floor(Math.random() * 100) + 50,
+      });
+    }
+    
+    setDailyVisits(data);
   };
 
   const formatDate = (dateString: string) => {
@@ -93,6 +127,31 @@ export default function AdminDashboardPage() {
     );
   }
 
+  // 메뉴 카드 데이터
+  const menuCards = [
+    {
+      title: 'Works 관리',
+      description: '포트폴리오 작업물 관리',
+      icon: FileText,
+      href: '/admin/works',
+      stats: worksStats ? `${worksStats.activeWorks}개 활성` : '로딩 중...',
+    },
+    {
+      title: '통계',
+      description: '방문자 및 활동 분석',
+      icon: BarChart3,
+      href: '/admin/analytics',
+      stats: worksStats ? `${worksStats.totalViews.toLocaleString()} 조회` : '로딩 중...',
+    },
+    {
+      title: '설정',
+      description: '시스템 환경 설정',
+      icon: Settings,
+      href: '/admin/settings',
+      stats: '관리자 설정',
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Main Content */}
@@ -103,31 +162,140 @@ export default function AdminDashboardPage() {
             환영합니다, {adminInfo?.name}님!
           </h2>
           <p className="text-gray-300">
-            HOWDOYOUDO Works 관리 시스템
+            HOWDOYOUDO 관리자 포털에 오신 것을 환영합니다.
           </p>
         </div>
 
-
         {/* Menu Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Works 관리 카드 */}
-          <Link
-            href="/admin/works"
-            className="group bg-white rounded-xl border-2 border-gray-200 p-8 hover:border-gray-900 hover:shadow-lg transition-all duration-300"
-          >
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-gray-900 transition-colors">
-                <FileText className="w-8 h-8 text-gray-600 group-hover:text-white transition-colors" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Works 관리
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                works 게시글을 관리합니다
-              </p>
-            </div>
-          </Link>
+        <div className="mb-8">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">빠른 메뉴</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {menuCards.map((card) => (
+              <Link
+                key={card.href}
+                href={card.href}
+                className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+              >
+                <div className={`absolute top-0 left-0 right-0 h-1`} />
+                <div className="p-6">
+                  <h4 className="text-lg font-bold text-gray-900 mb-2">
+                    {card.title}
+                  </h4>
+                  <p className="text-sm text-gray-600 mb-4">
+                    {card.description}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
+
+        {/* Daily Visitors Chart */}
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900">일일 접속자 통계</h3>
+              <p className="text-sm text-gray-600 mt-1">최근 30일간의 방문자 추이</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center">
+                <div className="w-3 h-3 rounded-full bg-gray-900 mr-2"></div>
+                <span className="text-sm text-gray-600">방문자</span>
+              </div>
+            </div>
+          </div>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={dailyVisits}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="#6b7280"
+                  fontSize={12}
+                  tickLine={false}
+                />
+                <YAxis 
+                  stroke="#6b7280"
+                  fontSize={12}
+                  tickLine={false}
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: '#fff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  }}
+                  labelStyle={{ color: '#111827', fontWeight: 'bold' }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="visitors" 
+                  stroke="#111827" 
+                  strokeWidth={2}
+                  dot={{ fill: '#111827', r: 4 }}
+                  activeDot={{ r: 6 }}
+                  name="방문자"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Recent Works */}
+        {worksStats && worksStats.recentWorks.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-gray-900">최근 작업물</h3>
+                <Link
+                  href="/admin/works"
+                  className="text-sm font-medium text-gray-900 hover:text-gray-700 flex items-center"
+                >
+                  전체 보기
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Link>
+              </div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {worksStats.recentWorks.slice(0, 5).map((work) => (
+                <div
+                  key={work.id}
+                  className="px-6 py-4 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900">{work.title}</h4>
+                      <div className="flex items-center space-x-4 mt-1">
+                        <span className="text-sm text-gray-600">
+                          {work.category_display_name}
+                        </span>
+                        <span className="text-sm text-gray-400">
+                          {formatDate(work.event_date)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Eye className="w-4 h-4 mr-1" />
+                        {work.view_count.toLocaleString()}
+                      </div>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          work.is_active
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {work.is_active ? '활성' : '비활성'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -49,7 +49,7 @@ export default function YearBar() {
 
     return (
         <div
-            className="hidden md:flex fixed pr-4 right-8 top-1/2 -translate-y-1/2 flex-col items-center z-40">
+            className="hidden md:flex fixed pr-4 right-32 top-1/2 -translate-y-4/9 flex-col items-center z-40">
             {/* 세로 라인 */}
             <div className="absolute w-px bg-gray-300 top-0 bottom-0 right-0"></div>
 
