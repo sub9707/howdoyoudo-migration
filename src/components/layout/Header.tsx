@@ -24,6 +24,7 @@ export default function Header() {
     { href: '/about', label: 'ABOUT' },
     { href: '/history', label: 'HISTORY' },
     { href: '/works', label: 'WORKS' },
+    { href: '/reel', label: 'REEL' },
     { href: '/contact', label: 'CONTACT' },
   ]
 

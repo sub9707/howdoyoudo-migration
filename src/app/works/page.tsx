@@ -15,11 +15,11 @@ async function getInitialData(): Promise<WorksResponse> {
     const response = await fetch(`${baseUrl}/api/works?page=1&limit=21`, {
       cache: 'no-store', // Disable caching for development
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch works');
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Error fetching initial data:', error);
@@ -35,12 +35,14 @@ async function getInitialData(): Promise<WorksResponse> {
 
 export default async function WorksPage() {
   const initialData = await getInitialData();
-  
+
   return (
     <div className="min-h-screen bg-white">
-      <PageHeader title='CREATIVE BUSINESS' description='하우두유두가 함께한 여정을 살펴보세요' />
-      
-      <WorksClient initialData={initialData} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <PageHeader title='CREATIVE BUSINESS' description='하우두유두가 함께한 여정을 살펴보세요' />
+
+        <WorksClient initialData={initialData} />
+      </div>
     </div>
   );
 }
